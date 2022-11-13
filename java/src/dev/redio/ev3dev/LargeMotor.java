@@ -1,61 +1,68 @@
 package dev.redio.ev3dev;
 
+import dev.redio.ev3dev.alloc.Args;
+import dev.redio.ev3dev.alloc.Native;
+import dev.redio.ev3dev.alloc.NativeField;
 import dev.redio.ev3dev.exceptions.Ev3Exception;
 
-public final class LargeMotor implements AutoCloseable {
+public final class LargeMotor extends Native<Ev3Exception, RuntimeException> {
 
-    private final long rustStructPtr;
+    @Override
+    protected native void new0(Args args) throws Ev3Exception;
 
-    private static native long new0(MotorPort port) throws Ev3Exception, Error;
+    @Override
+    protected native void delete0();
 
-    private static native void free0(long ptr) throws Ev3Exception, Error;
+    public native int getCountPerRotation() throws Ev3Exception;
 
-    private static native int getCountPerRotation0(long ptr) throws Ev3Exception;
+    public native int getCountPerM() throws Ev3Exception;
 
-    private static native int getCountPerM0(long ptr) throws Ev3Exception;
+    public native int getFullTravelCount() throws Ev3Exception;
 
-    private static native int getFullTravelCount0(long ptr) throws Ev3Exception;
+    public native int getDutyCycle() throws Ev3Exception;
 
-    private static native int getDutyCycle0(long ptr) throws Ev3Exception;
+    public native int getDutyCycleSp() throws Ev3Exception;
 
-    private static native int getDutyCycleSp0(long ptr) throws Ev3Exception;
+    public native void setDutyCycleSp(int dutyCycle) throws Ev3Exception;
 
-    private static native void setDutyCycleSp0(long ptr, int dutyCycle) throws Ev3Exception;
+    public native int getPolarity() throws Ev3Exception;
 
-    private static native int getPolarity0(long ptr) throws Ev3Exception;
+    public native void setPolarity(int polarity) throws Ev3Exception;
 
-    private static native void setPolarity0(long ptr, int polarity) throws Ev3Exception;
+    public native int getPosition() throws Ev3Exception;
 
-    private static native int getPosition0(long ptr) throws Ev3Exception;
+    public native void setPosition(int position) throws Ev3Exception;
 
-    private static native void setPosition0(long ptr, int position) throws Ev3Exception;
+    public native float getHoldPidKp() throws Ev3Exception;
 
-    private static native float getHoldPidKp0(long ptr) throws Ev3Exception;
+    public native void setHoldPidKp(float holdPid) throws Ev3Exception;
 
-    private static native void setHoldPidKp0(long ptr, float holdPid) throws Ev3Exception;
+    public native float getHoldPidKi() throws Ev3Exception;
 
-    private static native float getHoldPidKi0(long ptr) throws Ev3Exception;
+    public native void setHoldPidKi(float holdPid) throws Ev3Exception;
 
-    private static native void setHoldPidKi0(long ptr, float holdPid) throws Ev3Exception;
+    public native float getHoldPidKd() throws Ev3Exception;
 
-    private static native float getHoldPidKd0(long ptr) throws Ev3Exception;
+    public native void setHoldPidKd(float holdPid) throws Ev3Exception;
 
-    private static native void setHoldPidKd0(long ptr, float holdPid) throws Ev3Exception;
+    public native int getMaxSpeed() throws Ev3Exception;
 
-    private static native int getMaxSpeed(long ptr) throws Ev3Exception;
+    public native int getPositionSp() throws Ev3Exception;
 
-    private static native int getPositionSp0(long ptr) throws Ev3Exception;
-
-    private static native void setPositionSp0(long ptr, int position) throws Ev3Exception;
+    public native void setPositionSp(int position) throws Ev3Exception;
 
 
     public LargeMotor(MotorPort port) throws Ev3Exception {
-        this.rustStructPtr = new0(port);
+        super(new LargeMotorArgs(port));
+    }
 
+    private static class LargeMotorArgs implements Args {
+        @NativeField
+        public final MotorPort port;
+
+        public LargeMotorArgs(MotorPort port) {
+            this.port = port;
+        }
     }
-    @Override
-    public void close() throws Ev3Exception {
-        free0(rustStructPtr);
-    }
-    
+
 }

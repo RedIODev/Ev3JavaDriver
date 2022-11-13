@@ -1,8 +1,8 @@
 package dev.redio.ev3dev;
 
 public enum MotorPort {
-    OutA,
-    OutB,
-    OutC,
-    OutD;
+    OUT_A,
+    OUT_B,
+    OUT_C,
+    OUT_D;
 }
