@@ -8,7 +8,6 @@ edition = "2021"
 [dependencies]
 jni = "0.19"
 ev3dev-lang-rust = { version = "0.12.1", features=["screen"]}
-robusta_jni = "0.2.0"
 jni_proc_macro= {path= "./jni_proc_macro"}
 
 [lib]

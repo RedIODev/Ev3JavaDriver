@@ -1,43 +1,55 @@
 use proc_macro::TokenStream;
-use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::quote;
-use syn::parse::{Nothing, Result};
-use syn::token::Type;
-use syn::{parse_quote, Attribute, FnArg, Ident, ItemFn, PatType, ReturnType, parse_macro_input, ItemType};
-
+use quote::{quote,ToTokens};
+use syn::{ItemFn, Item, ReturnType,Type, PathArguments, GenericArgument};
+                                                                                                                        //todo: remove unwrap and generate usable error
 #[proc_macro_attribute]
-pub fn jni_func(args: TokenStream, input: TokenStream) -> TokenStream {
-    let args = TokenStream2::from(args);
-    let input = TokenStream2::from(input);
-    
-    let expanded = match parse(args, input.clone()) {
-        Ok(function) => expand_jni_func(function),
-        Err(parse_error) => {
-            let compile_error = parse_error.to_compile_error();
-            quote!(#compile_error #input)
-        }
-    };
-    TokenStream::from(expanded)
+pub fn jni_func(args: TokenStream, module: TokenStream) -> TokenStream {    //todo: impl name mangling based on args
+    let mut module :syn::ItemMod = syn::parse(module).unwrap();
+    let (brace, funcs) = module.content.unwrap();
+    let (funcs, mut rest):(Vec<Item>,Vec<Item>) = funcs.into_iter().partition(|x| matches!(x, Item::Fn(_)));
+    let funcs = funcs
+            .into_iter()
+            .filter_map(|x| if let Item::Fn(f) = x { Some(f)} else { None })
+            .map(parse_fn);
+    rest.extend(funcs);
+    module.content = Some((brace,rest));
+    TokenStream::from(module.to_token_stream())
 }
 
-fn parse(args: TokenStream2, input: TokenStream2) -> Result<ItemFn> {
-    let function: ItemFn = syn::parse2(input)?;
-    let _: Nothing = syn::parse2::<Nothing>(args)?;
-    Ok(function)
+
+fn parse_fn(f: ItemFn) -> Item {    //todo: func(jre) -> (), func() -> Result<..>, func() -> ()
+    let mut result = quote!{#[no_mangle] pub extern "system"};
+    f.to_token_stream().to_tokens(&mut result);
+    let mut f: ItemFn = syn::parse2(result).unwrap();
+    let (return_type, err_type) = get_result_ok_type(f.sig.output.clone()).unwrap();
+    let ReturnType::Type(_, t) = &mut f.sig.output else { panic!("Illegal ReturnType'")};
+    *t = Box::new(return_type.clone());
+    let body = f.block;
+    let new_body = quote!{{
+        let f = || #body;
+        let result: Result<#return_type,#err_type> = f();
+        match result {
+            Err(err) => {
+                jre.throw(err).unwrap();
+                unsafe {std::mem::zeroed()}
+            },
+            Ok(r) => r,
+        }
+    }};
+    f.block = Box::new(syn::parse2(new_body).unwrap());
+    Item::Fn(f)
 }
 
-fn expand_jni_func(mut function: ItemFn) -> TokenStream2 {
-    let sig = function.sig;
-    let args = sig.inputs;
-    let name = sig.ident;
-    let block = *function.block;
-    let func_name = format!("Java{}", name).parse().unwrap();
-    let out = ItemType sig.output;
-    quote! {
-        pub extern "system" fn #func_name (#args) -> #ret_type {
-            if let Err(err) = #block {
-                env.throw(err).unwrap();
-            }
-        }
-    }
+fn get_result_ok_type(out: ReturnType) -> Option<(Type,Type)> {
+    let ReturnType::Type(_, ret_type) = out else { return None; };
+    let Type::Path(ret_type_path) = * ret_type else { return None; };
+    let ret_type_path_segments = ret_type_path.path.segments.into_iter();
+    let result_type = ret_type_path_segments.last().unwrap();
+    if result_type.ident.to_string()!="Result" {return None; }
+    let result_type_args = result_type.arguments;
+    let PathArguments::AngleBracketed(result_generic_args) = result_type_args else { return None; };
+    let mut result_generic_args = result_generic_args.args.into_iter();
+    let GenericArgument::Type(ok_type) = result_generic_args.next().unwrap() else { return None;};
+    let GenericArgument::Type(err_type) = result_generic_args.next().unwrap() else { return None; };
+    Some((ok_type,err_type))
 }
