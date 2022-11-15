@@ -5,7 +5,7 @@ public abstract class Native<NX extends Exception, DX extends Exception> impleme
     @NativeField
     private long ptr;
 
-    protected Native(Args args) throws NX {
+    protected Native(Object... args) throws NX {
         new0(args);
     }
 
@@ -14,7 +14,7 @@ public abstract class Native<NX extends Exception, DX extends Exception> impleme
         delete0();
     }
 
-    protected abstract void new0(Args args) throws NX;
+    protected abstract void new0(Object... args) throws NX;
 
     protected abstract void delete0() throws DX;
 }

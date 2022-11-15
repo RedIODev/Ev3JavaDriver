@@ -1,14 +1,12 @@
 package dev.redio.ev3dev;
 
-import dev.redio.ev3dev.alloc.Args;
 import dev.redio.ev3dev.alloc.Native;
-import dev.redio.ev3dev.alloc.NativeField;
 import dev.redio.ev3dev.exceptions.Ev3Exception;
 
 public final class LargeMotor extends Native<Ev3Exception, RuntimeException> {
 
     @Override
-    protected native void new0(Args args) throws Ev3Exception;
+    protected native void new0(Object... args) throws Ev3Exception;
 
     @Override
     protected native void delete0();
@@ -53,16 +51,7 @@ public final class LargeMotor extends Native<Ev3Exception, RuntimeException> {
 
 
     public LargeMotor(MotorPort port) throws Ev3Exception {
-        super(new LargeMotorArgs(port));
+        super(port);
+        
     }
-
-    private static class LargeMotorArgs implements Args {
-        @NativeField
-        public final MotorPort port;
-
-        public LargeMotorArgs(MotorPort port) {
-            this.port = port;
-        }
-    }
-
 }

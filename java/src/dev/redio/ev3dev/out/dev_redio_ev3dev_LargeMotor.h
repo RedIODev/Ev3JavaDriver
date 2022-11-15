@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     dev_redio_ev3dev_LargeMotor
  * Method:    new0
- * Signature: (Ldev/redio/ev3dev/alloc/Args;)V
+ * Signature: ([Ljava/lang/Object;)V
  */
 JNIEXPORT void JNICALL Java_dev_redio_ev3dev_LargeMotor_new0
-  (JNIEnv *, jobject, jobject);
+  (JNIEnv *, jobject, jobjectArray);
 
 /*
  * Class:     dev_redio_ev3dev_LargeMotor
