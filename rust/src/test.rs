@@ -1,9 +1,9 @@
 
 
 mod macro_dev {
-    use jni_proc_macro::jni_func;
+    use jni_proc_macro::jni_mod;
 
-    #[jni_func]
+    #[jni_mod]
     mod ffi {
         
         use ev3dev_lang_rust::motors::LargeMotor;

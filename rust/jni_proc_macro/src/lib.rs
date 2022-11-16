@@ -1,9 +1,16 @@
 use proc_macro::TokenStream;
 use quote::{quote,ToTokens};
-use syn::{ItemFn, Item, ReturnType,Type, PathArguments, GenericArgument};
+use syn::{ItemFn, Item, ReturnType,Type, PathArguments, GenericArgument, parse_quote};
                                                                                                                         //todo: remove unwrap and generate usable error
+
 #[proc_macro_attribute]
-pub fn jni_func(args: TokenStream, module: TokenStream) -> TokenStream {    //todo: impl name mangling based on args
+pub fn jni_func(args: TokenStream, func:TokenStream) -> TokenStream {
+    func
+}
+
+
+#[proc_macro_attribute]
+pub fn jni_mod(args: TokenStream, module: TokenStream) -> TokenStream {    //todo: impl name mangling based on args
     let mut module :syn::ItemMod = syn::parse(module).unwrap();
     let (brace, funcs) = module.content.unwrap();
     let (funcs, mut rest):(Vec<Item>,Vec<Item>) = funcs.into_iter().partition(|x| matches!(x, Item::Fn(_)));
@@ -17,10 +24,10 @@ pub fn jni_func(args: TokenStream, module: TokenStream) -> TokenStream {    //to
 }
 
 
-fn parse_fn(f: ItemFn) -> Item {    //todo: func(jre) -> (), func() -> Result<..>, func() -> ()
-    let mut result = quote!{#[no_mangle] pub extern "system"};
-    f.to_token_stream().to_tokens(&mut result);
-    let mut f: ItemFn = syn::parse2(result).unwrap();
+fn parse_fn(mut f: ItemFn) -> Item {    //todo: func(jre) -> (), func() -> Result<..>, func() -> ()
+    f.vis = parse_quote!(pub);
+    f.sig.abi = Some(parse_quote!(extern "system"));
+    f.attrs.push(parse_quote!(#[no_mangle]));
     let (return_type, err_type) = get_result_ok_type(f.sig.output.clone()).unwrap();
     let ReturnType::Type(_, t) = &mut f.sig.output else { panic!("Illegal ReturnType'")};
     *t = Box::new(return_type.clone());

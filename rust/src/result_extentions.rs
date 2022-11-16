@@ -1,15 +1,23 @@
 
-pub trait FlattenInto<T, E>
+pub trait FlattenInto<T,E1,E2>
 {
-    fn flatten_into(self) -> Result<T,E>;
+    fn flatten_into<E>(self) -> Result<T,E>
+    where 
+        E1: Into<E>,
+        E2: Into<E>;
 }
 
-impl<T,E, E1, E2> FlattenInto<T,E> for Result<Result<T,E1>, E2> 
-where E: From<E1> + From<E2>     
+impl<T, E1, E2> FlattenInto<T,E1,E2> for Result<Result<T,E1>, E2> 
+     
 {
-    fn flatten_into(self) -> Result<T,E> {
-        self.map(|r| r.map_err(E::from))
-            .map_err(E::from)
+    fn flatten_into<E>(self) -> Result<T,E> 
+    where 
+        E1: Into<E>,
+        E2: Into<E>
+    {
+        self.map(|r| r.map_err(E1::into))
+            .map_err(E2::into)
             .flatten()
     }
 }
+
