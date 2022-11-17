@@ -113,7 +113,7 @@ mod func {
 
     fn parse_abi(func: &mut ItemFn) {
         func.vis = parse_quote!(pub);
-        func.sig.abi = Some(parse_quote!(extern "system"));
+        func.sig.abi = Some(parse_quote!(extern "C"));
         func.attrs.push(parse_quote!(#[no_mangle]));
     }
 

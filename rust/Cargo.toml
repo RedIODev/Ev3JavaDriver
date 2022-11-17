@@ -11,7 +11,8 @@ ev3dev-lang-rust = { version = "0.12.1", features=["screen"]}
 jni_proc_macro= {path= "./jni_proc_macro"}
 
 [lib]
-crate-type= ["staticlib"]
+crate-type= ["cdylib"]
+#crate-type= ["staticlib"]
 
 [workspace]
 members= ["jni_proc_macro"]

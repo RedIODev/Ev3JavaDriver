@@ -1,8 +1,6 @@
-#![feature(result_flattening)]
+// use std::ffi::c_void;
 
-use std::ffi::c_void;
-
-use jni::{JavaVM, sys::jint};
+// use jni::{sys::JavaVM, sys::jint};
 use jni_proc_macro::jni_package;
 
 mod alloc;
@@ -10,10 +8,10 @@ mod enum_conversions;
 mod errors;
 mod result_extensions;
 //mod test;
-#[no_mangle]
-pub extern "system" fn JNI_Onload_ev3(_vm:JavaVM, _ptr:*mut c_void) -> jint {
-    jni::sys::JNI_VERSION_1_8
-}
+// #[no_mangle]
+// pub extern "C" fn JNI_Onload_ev3(_vm:*mut JavaVM, _ptr:*mut c_void) -> jint {
+//     jni::sys::JNI_VERSION_1_8
+// }
 
 #[jni_package("dev.redio.ev3dev")]
 pub mod dev_redio_ev3dev {
