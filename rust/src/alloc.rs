@@ -8,10 +8,10 @@ pub trait RustObjectCarrier<T> where T: Sized + Send + 'static {
 
     fn borrow<'a>(&'a self, env: &'a JNIEnv) -> Result<MutexGuard<'a,T>>;
 
-    fn delete(&self, env: &JNIEnv) -> Result<()>;
+    fn take(&self, env: &JNIEnv) -> Result<T>;
 }
 
-const PTR_FIELD_NAME: &'static str = "ptr";
+const PTR_FIELD_NAME: &str = "ptr";
 
 impl<T> RustObjectCarrier<T> for JObject<'_>  where T: Sized + Send + 'static {
 
@@ -24,8 +24,8 @@ impl<T> RustObjectCarrier<T> for JObject<'_>  where T: Sized + Send + 'static {
         env.get_rust_field(*self, PTR_FIELD_NAME)
     }
 
-    fn delete(&self, env: &JNIEnv) -> Result<()> {
-        env.take_rust_field(*self, PTR_FIELD_NAME)?;
-         Ok(())
+    fn take(&self, env: &JNIEnv) -> Result<T> {
+        let f = env.take_rust_field(*self, PTR_FIELD_NAME)?;
+         Ok(f)
     }
 }

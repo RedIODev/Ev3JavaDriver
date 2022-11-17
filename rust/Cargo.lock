@@ -170,6 +170,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ev3"
+version = "0.1.0"
+dependencies = [
+ "ev3dev-lang-rust",
+ "jni",
+ "jni_proc_macro",
+]
+
+[[package]]
 name = "ev3dev-lang-rust"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -561,15 +570,6 @@ dependencies = [
  "crossbeam-deque",
  "crossbeam-utils",
  "num_cpus",
-]
-
-[[package]]
-name = "rust"
-version = "0.1.0"
-dependencies = [
- "ev3dev-lang-rust",
- "jni",
- "jni_proc_macro",
 ]
 
 [[package]]

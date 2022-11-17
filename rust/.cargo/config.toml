@@ -1,5 +1,6 @@
 [build]
 target = "armv5te-unknown-linux-musleabi"
+rustflags = ["-C", "link-args=-fPIC"]
 
 [target.armv5te-unknown-linux-musleabi]
 linker = "rust-lld"

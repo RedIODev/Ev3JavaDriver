@@ -2,6 +2,10 @@ package dev.redio.ev3dev.alloc;
 
 public abstract class Native<NX extends Exception, DX extends Exception> implements AutoCloseable {
     
+    static {
+        System.load("/lib/libev3.a");
+    }
+
     @NativeField
     private long ptr;
 

@@ -2,7 +2,7 @@ use ev3dev_lang_rust::Ev3Error;
 use jni::{objects::JThrowable, JNIEnv, descriptors::Desc};
 
 pub type JNIError = jni::errors::Error;
-pub type Ev3JApiResult<T> = core::result::Result<T, Ev3JApiError>;
+//pub type Ev3JApiResult<T> = core::result::Result<T, Ev3JApiError>;
 
 #[derive(Debug)]
 pub struct EnumConversionError;
@@ -40,16 +40,16 @@ impl<'a:'e,'e> IntoJThrowable<'a,'e> for EnumConversionError {
 #[derive(Debug)]
 pub enum Ev3JApiError {
     Ev3(Ev3Error),
-    JNI(JNIError),
+    Jni(JNIError),
     EnumConversion(EnumConversionError),
 }
 
 impl<'a : 'e, 'e> Desc<'a, JThrowable<'e>> for Ev3JApiError {
     fn lookup(self, env: &JNIEnv<'a>) -> jni::errors::Result<JThrowable<'e>> {
         match self {
-            Ev3JApiError::Ev3(e) => e.throwable(&env),
-            Ev3JApiError::JNI(e) => panic!("{}", e.to_string()),
-            Ev3JApiError::EnumConversion(e) => e.throwable(&env),
+            Ev3JApiError::Ev3(e) => e.throwable(env),
+            Ev3JApiError::Jni(e) => panic!("{}", e.to_string()),
+            Ev3JApiError::EnumConversion(e) => e.throwable(env),
         }
     }
 }
@@ -62,7 +62,7 @@ impl From<Ev3Error> for Ev3JApiError {
 
 impl From<JNIError> for Ev3JApiError {
     fn from(e: JNIError) -> Self {
-        Ev3JApiError::JNI(e)
+        Ev3JApiError::Jni(e)
     }
 }
 
