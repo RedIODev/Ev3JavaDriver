@@ -1,6 +1,5 @@
 use std::convert;
 
-
 pub trait Flatten<T,E> {
     fn flatten(self) -> Result<T, E>;
 }

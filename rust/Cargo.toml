@@ -3,8 +3,6 @@ name = "ev3"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 jni = "0.19"
 ev3dev-lang-rust = { version = "0.12.1", features=["screen"]}
@@ -12,7 +10,9 @@ jni_proc_macro= {path= "./jni_proc_macro"}
 
 [lib]
 crate-type= ["cdylib"]
-#crate-type= ["staticlib"]
 
 [workspace]
 members= ["jni_proc_macro"]
+
+[package.metadata.cross.build]
+default-target = "armv5te-unknown-linux-gnueabi"

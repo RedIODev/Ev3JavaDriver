@@ -1,7 +1,0 @@
-[build]
-target = "armv5te-unknown-linux-gnueabi"
-
-[target.armv5te-unknown-linux-gnueabi]
-linker = "rust-lld"
-#linker = "C:/Users/RedFace/Downloads/gcc-linaro-5.5.0-2017.10-i686-mingw32_arm-linux-gnueabihf.tar/gcc-linaro-5.5.0-2017.10-i686-mingw32_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc.exe"
-#ar = "C:/Users/RedFace/Downloads/gcc-linaro-5.5.0-2017.10-i686-mingw32_arm-linux-gnueabihf.tar/gcc-linaro-5.5.0-2017.10-i686-mingw32_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc-ar.exe"
