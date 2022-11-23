@@ -32,3 +32,17 @@ impl<T, E1, E2> FlattenInto<T,E1,E2> for Result<Result<T,E1>, E2>
     }
 }
 
+pub trait MapAuto<T,E> {
+    fn map_auto(self) -> Result<T,E>;
+}
+
+impl<T, U, E, F> MapAuto<U, F> for Result<T, E> 
+where 
+    U: From<T>,
+    F: From<E> 
+{
+    fn map_auto(self) -> Result<U, F> {
+        self.map_err(F::from)
+            .map(U::from)
+    }
+}

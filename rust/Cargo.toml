@@ -16,3 +16,6 @@ members= ["jni_proc_macro"]
 
 [package.metadata.cross.build]
 default-target = "armv5te-unknown-linux-gnueabi"
+
+[package.metadata.cross.target.armv5te-unknown-linux-gnueabi]
+image = "ghcr.io/cross-rs/armv5te-unknown-linux-gnueabi-cross:local"

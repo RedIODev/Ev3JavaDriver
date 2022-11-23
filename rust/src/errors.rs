@@ -71,3 +71,4 @@ impl From<EnumConversionError> for Ev3JApiError {
         Ev3JApiError::EnumConversion(e)
     }
 }
+

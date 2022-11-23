@@ -2,29 +2,35 @@ use std::sync::MutexGuard;
 
 use jni::{JNIEnv, objects::JObject, errors::Result};
 
-pub trait RustObjectCarrier<T> where T: Sized + Send + 'static {
+pub trait RustObjectCarrier {
 
-    fn store(&self, env: &JNIEnv, rust_object: T) -> Result<()>;
+    fn store<T>(&self, env: &JNIEnv, rust_object: T) -> Result<()>
+    where T: Send + 'static;
 
-    fn borrow<'a>(&'a self, env: &'a JNIEnv) -> Result<MutexGuard<'a,T>>;
+    fn borrow<'a, T>(&'a self, env: &'a JNIEnv) -> Result<MutexGuard<'a,T>>
+    where T: Send + 'static;
 
-    fn take(&self, env: &JNIEnv) -> Result<T>;
+    fn take<T>(&self, env: &JNIEnv) -> Result<T>
+    where T: Send + 'static;
 }
 
 const PTR_FIELD_NAME: &str = "ptr";
 
-impl<T> RustObjectCarrier<T> for JObject<'_>  where T: Sized + Send + 'static {
+impl RustObjectCarrier for JObject<'_> {
 
-    fn store(&self, env: &JNIEnv, rust_object: T) -> Result<()> {
+    fn store<T>(&self, env: &JNIEnv, rust_object: T) -> Result<()>
+    where T: Send + 'static {
         env.set_rust_field(*self, PTR_FIELD_NAME, rust_object)?;
         Ok(())
     }
 
-    fn borrow<'a>(&'a self, env: &'a JNIEnv) -> Result<MutexGuard<'a,T>> {
+    fn borrow<'a, T>(&'a self, env: &'a JNIEnv) -> Result<MutexGuard<'a, T>>
+    where T: Send + 'static {
         env.get_rust_field(*self, PTR_FIELD_NAME)
     }
 
-    fn take(&self, env: &JNIEnv) -> Result<T> {
+    fn take<T>(&self, env: &JNIEnv) -> Result<T> 
+    where T: Send + 'static {
         let f = env.take_rust_field(*self, PTR_FIELD_NAME)?;
          Ok(f)
     }
