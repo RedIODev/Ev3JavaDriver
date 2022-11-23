@@ -13,6 +13,9 @@ public abstract class Native<NX extends Exception, DX extends Exception> impleme
         new0(args);
     }
 
+    @NativeMethod
+    protected Native() {}
+
     @Override
     public void close() throws DX {
         delete0();

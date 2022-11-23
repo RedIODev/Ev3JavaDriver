@@ -1,5 +1,7 @@
-mod macro_dev {
-    use jni_proc_macro::jni_package;
+// use ev3dev_lang_rust::motors::{LargeMotor,MotorPort};
 
 
-}
+//     pub fn test() {
+//         let lm = LargeMotor::get(MotorPort::OutA).unwrap();
+//         lm.
+//     }

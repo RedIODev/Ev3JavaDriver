@@ -5,5 +5,8 @@
             "path": "C:\\Java\\jdk-11.0.12",
             "default": true
         }
+    ],
+    "cSpell.words": [
+        "Setpoint"
     ]
 }

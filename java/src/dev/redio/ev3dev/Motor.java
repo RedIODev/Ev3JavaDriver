@@ -1,9 +1,10 @@
 package dev.redio.ev3dev;
 
 import dev.redio.ev3dev.alloc.Native;
+import dev.redio.ev3dev.alloc.NativeMethod;
 import dev.redio.ev3dev.exceptions.Ev3Exception;
 
-public final class LargeMotor extends Native<Ev3Exception, RuntimeException> {
+public final class Motor extends Native<Ev3Exception, RuntimeException> {
 
     @Override
     protected native void new0(Object... args) throws Ev3Exception;
@@ -21,7 +22,7 @@ public final class LargeMotor extends Native<Ev3Exception, RuntimeException> {
 
     //public native int getDutyCycleSp() throws Ev3Exception;
 
-     public native void setDutyCycleSp(int dutyCycle) throws Ev3Exception;
+     public native void setDutyCycleSetpoint(int dutyCycle) throws Ev3Exception;
 
     // public native int getPolarity() throws Ev3Exception;
 
@@ -51,10 +52,26 @@ public final class LargeMotor extends Native<Ev3Exception, RuntimeException> {
 
     //...
 
+    public native void setTimeSetPoint(int mills) throws Ev3Exception;
+
+    public native void setSpeedSetPoint(int speed) throws Ev3Exception;
+
     public native void runDirect() throws Ev3Exception;
 
+    public native void runTimed() throws Ev3Exception;
 
-    public LargeMotor(MotorPort port) throws Ev3Exception {
+    public native void runTimed(long mills) throws Ev3Exception;
+
+    public native void runForever() throws Ev3Exception;
+
+    public native String getStopAction() throws Ev3Exception;
+
+    public native void stop() throws Ev3Exception;
+
+    public Motor(MotorPort port) throws Ev3Exception {
         super(port);
     }
+
+    @NativeMethod
+    private Motor() {}
 }

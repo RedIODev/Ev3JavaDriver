@@ -19,3 +19,10 @@ default-target = "armv5te-unknown-linux-gnueabi"
 
 [package.metadata.cross.target.armv5te-unknown-linux-gnueabi]
 image = "ghcr.io/cross-rs/armv5te-unknown-linux-gnueabi-cross:local"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+opt-level = 2
+strip = true
