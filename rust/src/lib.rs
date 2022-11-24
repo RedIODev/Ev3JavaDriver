@@ -8,11 +8,11 @@ mod jni_shortcuts;
 mod result_extensions;
 //mod test;
 
-//#[jni_package("dev.redio.ev3dev")]
+#[jni_package("dev.redio.ev3dev")]
 pub mod dev_redio_ev3dev {
     use jni_proc_macro::jni_class;
 
-    //#[jni_class("Motor")]
+    #[jni_class("Motor")]
     pub mod large_motor {
         use std::{time::Duration, borrow::Cow};
 
@@ -340,7 +340,7 @@ pub mod dev_redio_ev3dev {
 
     }
 
-    //#[jni_class("ColorSensor")]
+    #[jni_class("ColorSensor")]
     pub mod color_sensor {
 
         use std::{time::Duration, borrow::Cow};
