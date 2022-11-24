@@ -8,5 +8,6 @@
     ],
     "cSpell.words": [
         "Setpoint"
-    ]
+    ],
+    "rust-analyzer.cargo.target": "armv5te-unknown-linux-gnueabi",
 }

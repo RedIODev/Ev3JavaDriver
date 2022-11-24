@@ -1,5 +1,7 @@
 package dev.redio.ev3dev;
 
+import java.util.function.BooleanSupplier;
+
 import dev.redio.ev3dev.alloc.Native;
 import dev.redio.ev3dev.alloc.NativeMethod;
 import dev.redio.ev3dev.exceptions.Ev3Exception;
@@ -130,4 +132,16 @@ public final class Motor extends Native {
     public native boolean isLarge() throws Ev3Exception;
 
     public native void waitUntilNotMoving() throws Ev3Exception;
+
+    public native void waitUntilNotMoving(long mills) throws Ev3Exception;
+
+    public native void waitWhile(String state) throws Ev3Exception;
+
+    public native void waitWhile(String state, long mills) throws Ev3Exception;
+
+    public native boolean wait(BooleanSupplier cond) throws Ev3Exception;
+
+    public native boolean wait(BooleanSupplier cond, long mills) throws Ev3Exception;
+
+
 }
