@@ -181,7 +181,10 @@ mod func {
             let result: Result<#ok, #err> = body();
             match result {
                 Err(err) => {
-                    #runtime.throw(err).unwrap();
+                    match #runtime.throw(err) {
+                        Ok(_) => {},
+                        Err(err) => println!("ExceptionError:{:?}", err)
+                    }
                     unsafe { std::mem::zeroed() } // Will be discarded by jvm since Exception was thrown.
                 },
                 Ok(result) => result

@@ -16,7 +16,7 @@ pub mod dev_redio_ev3dev {
     pub mod large_motor {
         use std::{time::Duration, borrow::Cow};
 
-        use ev3dev_lang_rust::motors::TachoMotor;
+        use ev3dev_lang_rust::motors::{TachoMotor, LargeMotor, MediumMotor};
         use jni::{
             objects::{JClass, JObject, JString},
             sys::{jobjectArray, jlong},
@@ -38,8 +38,8 @@ pub mod dev_redio_ev3dev {
 
         fn list(jre: JNIEnv, class: JClass) -> Result<jobjectArray, Ev3JApiError> {
             let motors = TachoMotor::list()?;
-            vec_to_jarray(&jre, motors, class, |jre, lm| {
-                wrap_obj(&jre, class.clone(), lm)
+            vec_to_jarray(&jre, motors, class, |jre, motor| {
+                wrap_obj(&jre, class.clone(), motor)
             })
         }
 
@@ -196,11 +196,24 @@ pub mod dev_redio_ev3dev {
             consumer(&jre, &this, Some(Duration::from_millis(mills as u64)), TachoMotor::run_timed)
         }
 
-        fn runToAbsolutePosition(jre: JNIEnv, this: JObject, pos: i32) -> Result<(), Ev3JApiError> {
+        fn runToAbsolutePosition__(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
+            consumer(&jre, &this, None, TachoMotor::run_to_abs_pos)
+        }
+
+        fn runToAbsolutePosition__I(jre: JNIEnv, this: JObject, pos: i32) -> Result<(), Ev3JApiError> {
             consumer(&jre, &this, Some(pos), TachoMotor::run_to_abs_pos)
         }
 
-        fn runToRelativePosition(jre: JNIEnv, this: JObject, pos: i32) -> Result<(), Ev3JApiError> {
+        fn runToRelativePosition__(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
+            // let motor = this.borrow::<TachoMotor>(&jre)?;
+            // println!("Got motor");
+            // motor.
+            // motor.run_to_rel_pos(None)?;
+            // Ok(())
+            consumer(&jre, &this, None, TachoMotor::run_to_rel_pos)
+        }
+
+        fn runToRelativePosition__I(jre: JNIEnv, this: JObject, pos: i32) -> Result<(), Ev3JApiError> {
             consumer(&jre, &this, Some(pos), TachoMotor::run_to_rel_pos)
         }
 
@@ -272,10 +285,103 @@ pub mod dev_redio_ev3dev {
             supplier(&jre, &this, TachoMotor::stop)
         }
 
-        fn isLarge(jre: JNIEnv, this: JObject, millis: i32) -> Result<bool, Ev3JApiError> {
+        fn isLarge(jre: JNIEnv, this: JObject) -> Result<bool, Ev3JApiError> {
             let motor = this.borrow::<TachoMotor>(&jre)?;
             Ok(motor.clone().into_large_motor().is_ok())
         }
 
+        fn waitUntilNotMoving(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
+            let motor = this.borrow::<TachoMotor>(&jre)?;
+            match motor.clone().into_large_motor() {
+                Ok(lm) => {lm.wait_until_not_moving(None);},
+                Err(m) => match m.into_medium_motor() {
+                    Ok(mm) => {mm.wait_until_not_moving(None);},
+                    Err(_) => {
+                        println!("Error motor not recognized");
+                    }
+                }
+            }
+            Ok(())
+        }
+
+    }
+
+    #[jni_class("ColorSensor")]
+    pub mod color_sensor {
+
+        use std::{time::Duration, borrow::Cow};
+
+        use ev3dev_lang_rust::{motors::TachoMotor, sensors::ColorSensor};
+        use jni::{
+            objects::{JClass, JObject, JString},
+            sys::{jobjectArray, jlong},
+            JNIEnv,
+        };
+
+        use crate::{
+            alloc::RustObjectCarrier,
+            enum_conversions::{IntEnum, JavaEnum},
+            errors::Ev3JApiError,
+            jni_shortcuts::{supplier, vec_to_jarray, wrap_obj, consumer,new_color},
+            result_extensions::{FlattenInto, MapAuto},
+        };
+
+        fn find<'a>(jre: JNIEnv<'a>, class: JClass<'a>) -> Result<JObject<'a>, Ev3JApiError> {
+            let sensor = ColorSensor::find()?;
+            wrap_obj(&jre, class, sensor)
+        }
+
+        fn list(jre: JNIEnv, class: JClass) -> Result<jobjectArray, Ev3JApiError> {
+            let sensors = ColorSensor::list()?;
+            vec_to_jarray(&jre, sensors, class, |jre, sensor| {
+                wrap_obj(&jre, class.clone(), sensor)
+            })
+        }
+
+        fn new0(jre: JNIEnv, this: JObject, args: jobjectArray) -> Result<(), Ev3JApiError> {
+            let port = jre
+                .get_object_array_element(args, 0)
+                .and_then(|o| o.ordinal(&jre))
+                .map(IntEnum::try_into)
+                .flatten_into::<Ev3JApiError>()?;
+            let sensor = ColorSensor::get(port)?;
+            this.store(&jre, sensor).map_auto()
+        }
+
+        fn delete0(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
+            let _ = this.take(&jre)?;
+            Ok(())
+        }
+
+        fn getBlue(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {    
+            supplier(&jre, &this, ColorSensor::get_blue)
+        }
+
+        fn getColor(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {    
+            supplier(&jre, &this, ColorSensor::get_color)
+        }
+
+        fn getGreen(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {    
+            supplier(&jre, &this, ColorSensor::get_green)
+        }
+
+        fn getRed(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {    
+            supplier(&jre, &this, ColorSensor::get_red)
+        }
+
+        fn getRGB<'a>(jre: JNIEnv<'a>, this: JObject<'a>) -> Result<JObject<'a>, Ev3JApiError> {    
+            let (r,g,b) = supplier(&jre, &this, ColorSensor::get_rgb)?;
+            new_color(&jre, r, g, b)
+        }
+
+        fn setWhite(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {    //combine with others
+            supplier(&jre, &this, ColorSensor::set_mode_col_color)
+        }
+
+        fn setRGBRaw(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {    //combine with others
+            supplier(&jre, &this, ColorSensor::set_mode_rgb_raw)
+        }
+
+        
     }
 }

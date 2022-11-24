@@ -57,3 +57,11 @@ where T: Send + 'static
     jobj.store(jre, val)?;
     Ok(jobj)
 } 
+
+pub fn new_color<'a>(jre: &JNIEnv<'a>, red: i32, green: i32, blue: i32) -> Result<JObject<'a>, Ev3JApiError> {
+    let red = jni::objects::JValue::Int(red);
+    let green = jni::objects::JValue::Int(green);
+    let blue = jni::objects::JValue::Int(blue);
+    let jobj = jre.new_object("dev/redio/ev3dev/Color", "(III)V", &[red, green, blue])?;
+    Ok(jobj)
+}

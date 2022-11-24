@@ -1,6 +1,8 @@
 package dev.redio.ev3dev.alloc;
 
-public abstract class Native<NX extends Exception, DX extends Exception> implements AutoCloseable {
+import dev.redio.ev3dev.exceptions.Ev3Exception;
+
+public abstract class Native implements AutoCloseable {
     
     static {
         System.loadLibrary("ev3");
@@ -9,7 +11,7 @@ public abstract class Native<NX extends Exception, DX extends Exception> impleme
     @NativeField
     private long ptr;
 
-    protected Native(Object... args) throws NX {
+    protected Native(Object... args) throws Ev3Exception {
         new0(args);
     }
 
@@ -17,11 +19,11 @@ public abstract class Native<NX extends Exception, DX extends Exception> impleme
     protected Native() {}
 
     @Override
-    public void close() throws DX {
+    public void close() throws Ev3Exception {
         delete0();
     }
 
-    protected abstract void new0(Object... args) throws NX;
+    protected abstract void new0(Object... args) throws Ev3Exception;
 
-    protected abstract void delete0() throws DX;
+    protected abstract void delete0() throws Ev3Exception;
 }
