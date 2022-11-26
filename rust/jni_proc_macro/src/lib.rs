@@ -40,6 +40,11 @@ pub fn jni_class(args: TokenStream, class: TokenStream) -> TokenStream {
     TokenStream::from(class_mod.to_token_stream())
 }
 
+// #[proc_macro_attribute]
+// pub fn optional_overload(args: TokenStream, func: TokenStream) -> TokenStream {
+//     func
+// }
+
 mod package {
     use syn::{ItemMod, Item, ItemFn};
 

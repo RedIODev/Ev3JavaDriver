@@ -131,17 +131,17 @@ public final class Motor extends Native {
 
     public native boolean isLarge() throws Ev3Exception;
 
-    public native void waitUntilNotMoving() throws Ev3Exception;
+    public native void sleepUntilNotMoving() throws Ev3Exception;
 
-    public native void waitUntilNotMoving(long mills) throws Ev3Exception;
+    public native void sleepUntilNotMoving(long mills) throws Ev3Exception;
 
-    public native void waitWhile(String state) throws Ev3Exception;
+    public native void sleepWhile(String state) throws Ev3Exception;
 
-    public native void waitWhile(String state, long mills) throws Ev3Exception;
+    public native void sleepWhile(String state, long mills) throws Ev3Exception;
 
-    public native boolean wait(BooleanSupplier cond) throws Ev3Exception;
+    public native boolean sleep(BooleanSupplier cond) throws Ev3Exception;
 
-    public native boolean wait(BooleanSupplier cond, long mills) throws Ev3Exception;
+    public native boolean sleep(BooleanSupplier cond, long mills) throws Ev3Exception;
 
 
 }

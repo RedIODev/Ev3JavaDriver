@@ -23,10 +23,6 @@ public final class Color {
         return blue;
     }
 
-    public double blackWhite() {
-        return (red + green + blue) /3.0;
-    }
-
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("Color[red=");

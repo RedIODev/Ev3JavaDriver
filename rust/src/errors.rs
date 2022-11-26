@@ -1,3 +1,5 @@
+use std::str::Utf8Error;
+
 use ev3dev_lang_rust::Ev3Error;
 use jni::{objects::JThrowable, JNIEnv, descriptors::Desc};
 
@@ -35,6 +37,18 @@ impl<'a:'e,'e> IntoJThrowable<'a,'e> for EnumConversionError {
     }
 }
 
+impl<'a:'e,'e> IntoJThrowable<'a,'e> for Utf8Error {
+    fn throwable(&self, env: & JNIEnv<'a>) -> jni::errors::Result<JThrowable<'e>> {
+        let msg = env.new_string(format!("{:?}", self))?;
+        let ex = env.new_object(
+            "dev/redio/ev3dev/exceptions/StringFormatException",
+            "(Ljava/lang/String;)V",
+            &[msg.into()],
+        )?;
+        Ok(JThrowable::from(ex))
+    }
+}
+
 
 
 #[derive(Debug)]
@@ -42,14 +56,17 @@ pub enum Ev3JApiError {
     Ev3(Ev3Error),
     Jni(JNIError),
     EnumConversion(EnumConversionError),
+    StringFormat(Utf8Error)
 }
 
 impl<'a : 'e, 'e> Desc<'a, JThrowable<'e>> for Ev3JApiError {
     fn lookup(self, env: &JNIEnv<'a>) -> jni::errors::Result<JThrowable<'e>> {
+        use crate::errors::Ev3JApiError::*;
         match self {
-            Ev3JApiError::Ev3(e) => e.throwable(env),
-            Ev3JApiError::Jni(e) => panic!("{}", e.to_string()),
-            Ev3JApiError::EnumConversion(e) => e.throwable(env),
+            Ev3(e) => e.throwable(env),
+            Jni(e) => panic!("JNI:{}", e),
+            EnumConversion(e) => e.throwable(env),
+            StringFormat(e) => e.throwable(env),
         }
     }
 }
@@ -69,6 +86,12 @@ impl From<JNIError> for Ev3JApiError {
 impl From<EnumConversionError> for Ev3JApiError {
     fn from(e: EnumConversionError) -> Self {
         Ev3JApiError::EnumConversion(e)
+    }
+}
+
+impl From<Utf8Error> for Ev3JApiError {
+    fn from(e: Utf8Error) -> Self {
+        Ev3JApiError::StringFormat(e)
     }
 }
 

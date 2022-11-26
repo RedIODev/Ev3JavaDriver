@@ -25,17 +25,23 @@ public final class ColorSensor extends Native {
     protected native void delete0() throws Ev3Exception;
     
     public native int getBlue() throws Ev3Exception;
-
-    public native int getColor() throws Ev3Exception;
-
+    
+    
     public native int getGreen() throws Ev3Exception;
-
+    
     public native int getRed() throws Ev3Exception;
+
+    public native int getIntensity() throws Ev3Exception;
 
     public native Color getRGB() throws Ev3Exception;
 
-    public native void setWhite() throws Ev3Exception;
+    public native void setMode(Mode mode) throws Ev3Exception;
 
-    public native void setRGBRaw() throws Ev3Exception;
+    public native Mode getMode() throws Ev3Exception;
 
+    public enum Mode {
+        COLOR,
+        REFLECTION,
+        AMBIENT;
+    }
 }
