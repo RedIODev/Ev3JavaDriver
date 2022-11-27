@@ -47,18 +47,17 @@ where
     Ok(f(&rust_struct, input, input2))
 }
 
-pub fn vec_to_jarray<'a, 'b, T, A, O, E, F>(
-    jre: &'a JNIEnv,
+pub fn vec_to_jarray<'a, T, A, O, E, F>(
+    jre: JNIEnv<'a>,
     vec: Vec<T>,
     array_type: A,
     f: F,
 ) -> Result<jobjectArray, Ev3JApiError>
 where
     A: Desc<'a, JClass<'a>>,
-    F: Fn(&JNIEnv<'a>, T) -> Result<O, E>,
+    F: Fn(JNIEnv<'a>, T) -> Result<O, E>,
     O: Into<JObject<'a>>,
     Ev3JApiError: From<E>,
-    T: 'b,
 {
     let array = jre.new_object_array(vec.len() as i32, array_type, JObject::null())?;
     let len = vec.len();
@@ -103,7 +102,7 @@ pub fn boolean_supplier_callback<'a>(jre: JNIEnv<'a>, f: JObject<'a>) -> impl Fn
 }
 
 pub fn getClassSpecifier(jre: JNIEnv, class: JClass) -> Result<String, Ev3JApiError> {
-    let java_name:JString = jre.call_static_method(class, "getName", "()Ljava/lang/String;", &[])?.l()?.into();
+    let java_name:JString = jre.call_method(class, "getName", "()Ljava/lang/String;", &[])?.l()?.into();
     let jstr = &jre.get_string(java_name)?;
     let str_name = &*Into::<Cow<str>>::into(jstr);
     let mut class_name = str_name.replace('.', "/");

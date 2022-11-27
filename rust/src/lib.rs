@@ -28,7 +28,7 @@ pub mod dev_redio_ev3dev {
         use crate::{
             alloc::RustObjectCarrier,
             enum_conversions::{IntEnum, JavaEnum},
-            errors::Ev3JApiError,
+            errors::{Ev3JApiError, EnumConversionError},
             jni_shortcuts::{try_supplier, vec_to_jarray, wrap_obj, try_consumer, function, bi_function, boolean_supplier_callback},
             result_extensions::{FlattenInto, MapAuto},
         };
@@ -40,8 +40,8 @@ pub mod dev_redio_ev3dev {
 
         fn list(jre: JNIEnv, class: JClass) -> Result<jobjectArray, Ev3JApiError> {
             let motors = TachoMotor::list()?;
-            vec_to_jarray(&jre, motors, class, |jre, motor| {
-                wrap_obj(*jre, class, motor)
+            vec_to_jarray(jre, motors, class, |jre, motor| {
+                wrap_obj(jre, class, motor)
             })
         }
 
@@ -60,25 +60,27 @@ pub mod dev_redio_ev3dev {
             Ok(())
         }
 
-        fn getCountPerMeter(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
-            try_supplier(jre, this, TachoMotor::get_count_per_m)
-        }
+        //NOT SUPPORTED
+        // fn getDegreePerMeter(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
+        //     try_supplier(jre, this, TachoMotor::get_count_per_m)
+        // }
 
-        fn getCountPerRotation(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
+        fn getUnitsPerRotation(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
             try_supplier(jre, this, TachoMotor::get_count_per_rot)
         }
 
-        fn getDutyCycle(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
+        fn getLoad(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
             try_supplier(jre, this, TachoMotor::get_duty_cycle)
         }
 
-        fn getDutyCycleSetpoint(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
+        fn getTargetLoad(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
             try_supplier(jre, this, TachoMotor::get_duty_cycle_sp)
         }
 
-        fn getFullTravelCount(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
-            try_supplier(jre, this, TachoMotor::get_full_travel_count)
-        }
+        //NOT SUPPORTED
+        // fn getFullTravelCount(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
+        //     try_supplier(jre, this, TachoMotor::get_full_travel_count)
+        // }
 
         fn getHoldPidKd(jre: JNIEnv, this: JObject) -> Result<f32, Ev3JApiError> {
             try_supplier(jre, this, TachoMotor::get_hold_pid_kd)
@@ -99,20 +101,32 @@ pub mod dev_redio_ev3dev {
         fn getPolarity<'a>(
             jre: JNIEnv<'a>,
             this: JObject<'a>,
-        ) -> Result<JString<'a>, Ev3JApiError> {
-            let str = try_supplier(jre, this, TachoMotor::get_polarity)?;
-            jre.new_string(str).map_err(Ev3JApiError::from)
+        ) -> Result<JObject<'a>, Ev3JApiError> {
+            const ENUM_TYPE:&str = "dev/redio/ev3dev/Motor$Polarity";
+            let enum_constants = JObject::values(jre, ENUM_TYPE)?;
+            let string = try_supplier(jre, this, TachoMotor::get_polarity)?;
+            let ordinal = match string.as_str() {
+                TachoMotor::POLARITY_NORMAL => 0,
+                TachoMotor::POLARITY_INVERSED => 1,
+                _ => return Err(EnumConversionError.into())
+            };
+            jre.get_object_array_element(enum_constants, ordinal).map_err(Ev3JApiError::from)
         }
 
-        fn getPosition(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
+        fn getAbsolutePosition(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
             try_supplier(jre, this, TachoMotor::get_position)
         }
 
-        fn getRampDownSetpoint(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
+        fn getTargetPosition(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
+            try_supplier(jre, this, TachoMotor::get_position_sp)
+        }
+
+
+        fn getSlowdownTime(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
             try_supplier(jre, this, TachoMotor::get_ramp_down_sp)
         }
 
-        fn getRampUpSetpoint(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
+        fn getSpeedupTime(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
             try_supplier(jre, this, TachoMotor::get_ramp_up_sp)
         }
 
@@ -132,29 +146,61 @@ pub mod dev_redio_ev3dev {
             try_supplier(jre, this, TachoMotor::get_speed_pid_kp)
         }
 
-        fn getSpeedPidSetpoint(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
+        fn getTargetSpeed(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
             try_supplier(jre, this, TachoMotor::get_speed_sp)
         }
 
         fn getState(jre: JNIEnv, this: JObject) -> Result<jobjectArray, Ev3JApiError> {
+            const ENUM_TYPE:&str = "dev/redio/ev3dev/Motor$State";
+            let enum_constants = JObject::values(jre, ENUM_TYPE)?;
             let state = try_supplier(jre, this, TachoMotor::get_state)?;
-            vec_to_jarray(&jre, state, "java/lang/String", JNIEnv::new_string)
+            let match_func = |_, string: String| {
+                let ordinal = match string.as_str() {
+                    TachoMotor::STATE_HOLDING => 0,
+                    TachoMotor::STATE_OVERLOADED => 1,
+                    TachoMotor::STATE_RAMPING => 2,
+                    TachoMotor::STATE_RUNNING => 3,
+                    TachoMotor::STATE_STALLED => 4,
+                    _ => return Err(EnumConversionError.into())
+                };
+                jre.get_object_array_element(enum_constants, ordinal).map_err(Ev3JApiError::from)
+            };
+            vec_to_jarray(jre, state, ENUM_TYPE, match_func)
         }
 
         fn getStopAction<'a>(
             jre: JNIEnv<'a>,
             this: JObject<'a>,
-        ) -> Result<JString<'a>, Ev3JApiError> {
-            let str = try_supplier(jre, this, TachoMotor::get_stop_action)?;
-            jre.new_string(str).map_err(Ev3JApiError::from)
+        ) -> Result<JObject<'a>, Ev3JApiError> {
+            const ENUM_TYPE:&str = "dev/redio/ev3dev/Motor$StopAction";
+            let enum_constants = JObject::values(jre, ENUM_TYPE)?;
+            let string = try_supplier(jre, this, TachoMotor::get_stop_action)?;
+            let ordinal = match string.as_str() {
+                TachoMotor::STOP_ACTION_BRAKE => 0,
+                TachoMotor::STOP_ACTION_COAST => 1,
+                TachoMotor::STOP_ACTION_HOLD => 2,
+                _ => return Err(EnumConversionError.into())
+            };
+            jre.get_object_array_element(enum_constants, ordinal).map_err(Ev3JApiError::from)
         }
 
-        fn getStopActions(jre: JNIEnv, this: JObject) -> Result<jobjectArray, Ev3JApiError> {
+        fn getSupportedStopActions(jre: JNIEnv, this: JObject) -> Result<jobjectArray, Ev3JApiError> {
+            const ENUM_TYPE:&str = "dev/redio/ev3dev/Motor$StopAction";
             let actions = try_supplier(jre, this, TachoMotor::get_stop_actions)?;
-            vec_to_jarray(&jre, actions, "java/lang/String", JNIEnv::new_string)
+            let enum_constants = JObject::values(jre, ENUM_TYPE)?;
+            let match_func = |_, string: String| {
+                let ordinal = match string.as_str() {
+                    TachoMotor::STOP_ACTION_BRAKE => 0,
+                    TachoMotor::STOP_ACTION_COAST => 1,
+                    TachoMotor::STOP_ACTION_HOLD => 2,
+                    _ => return Err(EnumConversionError.into())
+                };
+                jre.get_object_array_element(enum_constants, ordinal).map_err(Ev3JApiError::from)
+            };
+            vec_to_jarray(jre, actions, ENUM_TYPE, match_func)
         }
 
-        fn getTimeSetpoint(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
+        fn getTargetDuration(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {
             try_supplier(jre, this, TachoMotor::get_time_sp)
         }
 
@@ -182,39 +228,39 @@ pub mod dev_redio_ev3dev {
             try_supplier(jre, this, TachoMotor::reset)
         }
 
-        fn runDirect(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
+        fn rotateLoad(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
             try_supplier(jre, this, TachoMotor::run_direct)
         }
 
-        fn runForever(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
+        fn rotate(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
             try_supplier(jre, this, TachoMotor::run_forever)
         }
 
-        fn runTimed__(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
+        fn rotateUntil__(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
             try_consumer(jre, this, None, TachoMotor::run_timed)
         }
 
-        fn runTimed__J(jre: JNIEnv, this: JObject, mills: i64) -> Result<(), Ev3JApiError> {
+        fn rotateUntil__J(jre: JNIEnv, this: JObject, mills: i64) -> Result<(), Ev3JApiError> {
             try_consumer(jre, this, Some(Duration::from_millis(mills as u64)), TachoMotor::run_timed)
         }
 
-        fn runToAbsolutePosition__(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
+        fn rotateAbsolute__(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
             try_consumer(jre, this, None, TachoMotor::run_to_abs_pos)
         }
 
-        fn runToAbsolutePosition__I(jre: JNIEnv, this: JObject, pos: i32) -> Result<(), Ev3JApiError> {
+        fn rotateAbsolute__I(jre: JNIEnv, this: JObject, pos: i32) -> Result<(), Ev3JApiError> {
             try_consumer(jre, this, Some(pos), TachoMotor::run_to_abs_pos)
         }
 
-        fn runToRelativePosition__(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
+        fn rotateRelative__(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
             try_consumer(jre, this, None, TachoMotor::run_to_rel_pos)
         }
 
-        fn runToRelativePosition__I(jre: JNIEnv, this: JObject, pos: i32) -> Result<(), Ev3JApiError> {
+        fn rotateRelative__I(jre: JNIEnv, this: JObject, pos: i32) -> Result<(), Ev3JApiError> {
             try_consumer(jre, this, Some(pos), TachoMotor::run_to_rel_pos)
         }
 
-        fn setDutyCycleSetpoint(jre: JNIEnv, this: JObject, duty_cycle: i32) -> Result<(), Ev3JApiError> {
+        fn setTargetLoad(jre: JNIEnv, this: JObject, duty_cycle: i32) -> Result<(), Ev3JApiError> {
             try_consumer(jre, this, duty_cycle, TachoMotor::set_duty_cycle_sp)
         }
 
@@ -230,21 +276,25 @@ pub mod dev_redio_ev3dev {
             try_consumer(jre, this, kp, TachoMotor::set_hold_pid_kp)
         }
 
-        fn setPolarity(jre: JNIEnv, this: JObject, polarity: JString) -> Result<(), Ev3JApiError> {
-            let jstr = &jre.get_string(polarity)?;
-            let str = &*Into::<Cow<str>>::into(jstr);
-            try_consumer(jre, this, str, TachoMotor::set_polarity)
+        fn setPolarity(jre: JNIEnv, this: JObject, polarity: JObject) -> Result<(), Ev3JApiError> {
+            let ordinal = polarity.ordinal(jre)?;
+            let polarity = match ordinal.as_ref() {
+                0 => TachoMotor::POLARITY_NORMAL,
+                1 => TachoMotor::POLARITY_INVERSED,
+                _ => return Err(EnumConversionError.into())
+            };
+            try_consumer(jre, this, polarity, TachoMotor::set_polarity)
         }
 
         fn setPosition(jre: JNIEnv, this: JObject, pos: i32) -> Result<(), Ev3JApiError> {
             try_consumer(jre, this, pos, TachoMotor::set_position)
         }
 
-        fn setPositionSetpoint(jre: JNIEnv, this: JObject, pos: i32) -> Result<(), Ev3JApiError> {
+        fn setTargetPosition(jre: JNIEnv, this: JObject, pos: i32) -> Result<(), Ev3JApiError> {
             try_consumer(jre, this, pos, TachoMotor::set_position_sp)
         }
 
-        fn setRampDownSetPoint(jre: JNIEnv, this: JObject, sp: i32) -> Result<(), Ev3JApiError> {
+        fn setSlowdownTime(jre: JNIEnv, this: JObject, sp: i32) -> Result<(), Ev3JApiError> {
             try_consumer(jre, this, sp, TachoMotor::set_ramp_down_sp)
         }
 
@@ -264,17 +314,22 @@ pub mod dev_redio_ev3dev {
             try_consumer(jre, this, kp, TachoMotor::set_speed_pid_kp)
         }
 
-        fn setSpeedSetPoint(jre: JNIEnv, this: JObject, sp: i32) -> Result<(), Ev3JApiError> {
+        fn setTargetSpeed(jre: JNIEnv, this: JObject, sp: i32) -> Result<(), Ev3JApiError> {
             try_consumer(jre, this, sp, TachoMotor::set_speed_sp)
         }
 
-        fn setStopAction(jre: JNIEnv, this: JObject, stopAction: JString) -> Result<(), Ev3JApiError> {
-            let jstr = &jre.get_string(stopAction)?;
-            let str = &*Into::<Cow<str>>::into(jstr);
-            try_consumer(jre, this, str, TachoMotor::set_stop_action)
+        fn setStopAction(jre: JNIEnv, this: JObject, stopAction: JObject) -> Result<(), Ev3JApiError> {
+            let ordinal = stopAction.ordinal(jre)?;
+            let action = match ordinal.as_ref() {
+                0 => TachoMotor::STOP_ACTION_BRAKE,
+                1 => TachoMotor::STOP_ACTION_COAST,
+                2 => TachoMotor::STOP_ACTION_HOLD,
+                _ => return Err(EnumConversionError.into())
+            };
+            try_consumer(jre, this, action, TachoMotor::set_stop_action)
         }
 
-        fn setTimeSetPoint(jre: JNIEnv, this: JObject, mills: i32) -> Result<(), Ev3JApiError> {
+        fn setTargetDuration(jre: JNIEnv, this: JObject, mills: i32) -> Result<(), Ev3JApiError> {
             try_consumer(jre, this, mills, TachoMotor::set_time_sp)
         }
 
@@ -289,45 +344,62 @@ pub mod dev_redio_ev3dev {
 
         fn sleepUntilNotMoving__(jre: JNIEnv, this: JObject) -> Result<bool, Ev3JApiError> {
             function(jre, this, None, TachoMotor::wait_until_not_moving)
-            // let motor = this.borrow::<TachoMotor>(&jre)?;
-            // match motor.clone().into_large_motor() {
-            //     Ok(lm) => {lm.wait_until_not_moving(None);},
-            //     Err(m) => match m.into_medium_motor() {
-            //         Ok(mm) => {mm.wait_until_not_moving(None);},
-            //         Err(_) => {
-            //             println!("Error motor not recognized");
-            //         }
-            //     }
-            // }
-            // Ok(())
         }
 
         fn sleepUntilNotMoving__J(jre: JNIEnv, this: JObject, mills: i64) -> Result<bool, Ev3JApiError> {
             function(jre, this, Some(Duration::from_millis(mills as u64)), TachoMotor::wait_until_not_moving)
         }
 
-        fn sleepUntil__Ljava_lang_String_2(jre: JNIEnv, this: JObject, str: JString) -> Result<bool, Ev3JApiError> {
-            let jstr = &jre.get_string(str)?;
-            let str = &*Into::<Cow<str>>::into(jstr);
-            bi_function(jre, this, str, None, TachoMotor::wait_until)
+        fn sleepUntil__Ldev_redio_ev3dev_Motor_State_2(jre: JNIEnv, this: JObject, state: JObject) -> Result<bool, Ev3JApiError> {
+            let ordinal = state.ordinal(jre)?;
+            let state = match ordinal.as_ref() {
+                0 => TachoMotor::STATE_HOLDING,
+                1 => TachoMotor::STATE_OVERLOADED,
+                2 => TachoMotor::STATE_RAMPING,
+                3 => TachoMotor::STATE_RUNNING,
+                4 => TachoMotor::STATE_STALLED,
+                _ => return Err(EnumConversionError.into())
+            };
+            bi_function(jre, this, state, None, TachoMotor::wait_until)
         }
 
-        fn sleepUntil__Ljava_lang_String_2J(jre: JNIEnv, this: JObject, str: JString, mills: i64) -> Result<bool, Ev3JApiError> {
-            let jstr = &jre.get_string(str)?;
-            let str = &*Into::<Cow<str>>::into(jstr);
-            bi_function(jre, this, str, Some(Duration::from_millis(mills as u64)), TachoMotor::wait_until)
+        fn sleepUntil__Ldev_redio_ev3dev_Motor_State_2J(jre: JNIEnv, this: JObject, state: JObject, mills: i64) -> Result<bool, Ev3JApiError> {
+            let ordinal = state.ordinal(jre)?;
+            let state = match ordinal.as_ref() {
+                0 => TachoMotor::STATE_HOLDING,
+                1 => TachoMotor::STATE_OVERLOADED,
+                2 => TachoMotor::STATE_RAMPING,
+                3 => TachoMotor::STATE_RUNNING,
+                4 => TachoMotor::STATE_STALLED,
+                _ => return Err(EnumConversionError.into())
+            };
+            bi_function(jre, this, state, Some(Duration::from_millis(mills as u64)), TachoMotor::wait_until)
         }
 
-        fn sleep_while__Ljava_lang_String_2(jre: JNIEnv, this: JObject, str: JString) -> Result<bool, Ev3JApiError> {
-            let jstr = &jre.get_string(str)?;
-            let str = &*Into::<Cow<str>>::into(jstr);
-            bi_function(jre, this, str, None, TachoMotor::wait_while)
+        fn sleep_while__Ldev_redio_ev3dev_Motor_State_2(jre: JNIEnv, this: JObject, state: JObject) -> Result<bool, Ev3JApiError> {
+            let ordinal = state.ordinal(jre)?;
+            let state = match ordinal.as_ref() {
+                0 => TachoMotor::STATE_HOLDING,
+                1 => TachoMotor::STATE_OVERLOADED,
+                2 => TachoMotor::STATE_RAMPING,
+                3 => TachoMotor::STATE_RUNNING,
+                4 => TachoMotor::STATE_STALLED,
+                _ => return Err(EnumConversionError.into())
+            };
+            bi_function(jre, this, state, None, TachoMotor::wait_while)
         }
 
-        fn sleepWhile__Ljava_lang_String_2J(jre: JNIEnv, this: JObject, str: JString, mills: i64) -> Result<bool, Ev3JApiError> {
-            let jstr = &jre.get_string(str)?;
-            let str = &*Into::<Cow<str>>::into(jstr);
-            bi_function(jre, this, str, Some(Duration::from_millis(mills as u64)), TachoMotor::wait_while)
+        fn sleepWhile__Ldev_redio_ev3dev_Motor_State_2J(jre: JNIEnv, this: JObject, state: JObject, mills: i64) -> Result<bool, Ev3JApiError> {
+            let ordinal = state.ordinal(jre)?;
+            let state = match ordinal.as_ref() {
+                0 => TachoMotor::STATE_HOLDING,
+                1 => TachoMotor::STATE_OVERLOADED,
+                2 => TachoMotor::STATE_RAMPING,
+                3 => TachoMotor::STATE_RUNNING,
+                4 => TachoMotor::STATE_STALLED,
+                _ => return Err(EnumConversionError.into())
+            };
+            bi_function(jre, this, state, Some(Duration::from_millis(mills as u64)), TachoMotor::wait_while)
         }
 
         fn sleep__Ljava_util_function_BooleanSupplier_2(jre: JNIEnv, this: JObject, f: JObject) -> Result<bool, Ev3JApiError> {
@@ -341,7 +413,7 @@ pub mod dev_redio_ev3dev {
         }
 
         // #[optional_overload("java.util.function.BooleanSupplier", "long")]
-        // fn wait(jre: JNIEnv, this: JObject, f: JObject, mills: Option<i64>) -> Result<bool, Ev3JApiError> {
+        // fn sleep(jre: JNIEnv, this: JObject, f: JObject, mills: Option<i64>) -> Result<bool, Ev3JApiError> {
         //     let f = boolean_supplier_callback(&jre, &f);
         //     let mills = mills.map(|int| int as u64);
         //     bi_function(&jre, &this, f, mills.map(Duration::from_millis), TachoMotor::wait)
@@ -376,8 +448,8 @@ pub mod dev_redio_ev3dev {
 
         fn list(jre: JNIEnv, class: JClass) -> Result<jobjectArray, Ev3JApiError> {
             let sensors = ColorSensor::list()?;
-            vec_to_jarray(&jre, sensors, class, |jre, sensor| {
-                wrap_obj(*jre, class, sensor)
+            vec_to_jarray(jre, sensors, class, |jre, sensor| {
+                wrap_obj(jre, class, sensor)
             })
         }
 
@@ -428,7 +500,7 @@ pub mod dev_redio_ev3dev {
         }
 
         fn getMode<'a>(jre: JNIEnv<'a>, this: JObject<'a>) -> Result<JObject<'a>, Ev3JApiError> {
-            let values = JObject::values(jre, "dev/redio/ev3dev/ColorSensor/Mode")?;
+            let values = JObject::values(jre, "dev/redio/ev3dev/ColorSensor$Mode")?;
             if try_supplier(jre, this, ColorSensor::is_mode_rgb_raw)? {
                 return jre.get_object_array_element(values, 0).map_err(Ev3JApiError::from);
             }

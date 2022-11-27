@@ -25,6 +25,20 @@ impl<'a:'e,'e> IntoJThrowable<'a, 'e> for Ev3Error {
     }
 }
 
+// impl<'a:'e,'e> IntoJThrowable<'a, 'e> for JNIError {
+//     fn throwable(&self, env: &JNIEnv<'a>) -> jni::errors::Result<JThrowable<'e>> {
+//         let msg = env.new_string(self.to_string())?;
+//         let ex = env.new_object(
+//             "dev/redio/ev3dev/exceptions/Ev3Exception",
+//             "(Ljava/lang/String;)V",
+//             &[msg.into()],
+//         )?;
+//         Ok(JThrowable::from(ex))
+//     }
+// }
+
+
+
 impl<'a:'e,'e> IntoJThrowable<'a,'e> for EnumConversionError {
     fn throwable(&self, env: & JNIEnv<'a>) -> jni::errors::Result<JThrowable<'e>> {
         let msg = env.new_string(format!("{:?}", self))?;
@@ -64,7 +78,7 @@ impl<'a : 'e, 'e> Desc<'a, JThrowable<'e>> for Ev3JApiError {
         use crate::errors::Ev3JApiError::*;
         match self {
             Ev3(e) => e.throwable(env),
-            Jni(e) => panic!("JNI:{}", e),
+            Jni(e) => Err(e),
             EnumConversion(e) => e.throwable(env),
             StringFormat(e) => e.throwable(env),
         }

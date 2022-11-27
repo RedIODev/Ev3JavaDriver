@@ -10,6 +10,12 @@ pub enum ColorMode {
     Ambient
 }
 
+impl AsRef<i32> for IntEnum {
+    fn as_ref(&self) -> &i32 {
+        &self.0
+    }
+}
+
 impl From<i32> for IntEnum {
     fn from(value: i32) -> Self {
         Self(value)
@@ -75,7 +81,8 @@ impl JavaEnum for JObject<'_> {
     where T: Desc<'a, JClass<'c>>, {
         let class = class.lookup(&jre)?;
         let mut sig = getClassSpecifier(jre, class)?;
-        sig.insert_str(0, "()");
+        
+        sig.insert_str(0, "()[");   //empty arg list and arrayPrefix
         let obj = jre.call_static_method(class, "values", sig, &[])?.l()?;
         Ok(obj.into_inner())
         
