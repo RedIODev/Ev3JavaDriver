@@ -7,7 +7,16 @@
         }
     ],
     "cSpell.words": [
-        "Setpoint"
+        "jarray",
+        "jlong",
+        "jobj",
+        "jobject",
+        "jstr",
+        "Ldev",
+        "Ljava",
+        "Mindstorm",
+        "Setpoint",
+        "Tacho"
     ],
     "rust-analyzer.cargo.target": "armv5te-unknown-linux-gnueabi",
 }

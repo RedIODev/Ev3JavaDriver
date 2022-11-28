@@ -86,9 +86,9 @@ pub fn new_color(jre: JNIEnv, red: i32, green: i32, blue: i32) -> Result<JObject
 }
 
 
-pub fn boolean_supplier_callback<'a>(jre: JNIEnv<'a>, f: JObject<'a>) -> impl Fn() -> bool + 'a {
+pub fn condition_callback<'a>(jre: JNIEnv<'a>, f: JObject<'a>) -> impl Fn() -> bool + 'a {
     move || {
-        let result = jre.call_method(f, "getAsBoolean", "()Z", &[]);
+        let result = jre.call_method(f, "condition", "()Z", &[]);
         match result {
             Ok(jni::objects::JValue::Bool(b)) => b != 0,
             Ok(_) => panic!("Invalid type returned by java function."),

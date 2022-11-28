@@ -1,14 +1,15 @@
 package dev.redio.ev3dev;
 
-import java.util.function.BooleanSupplier;
-
 import dev.redio.ev3dev.alloc.Native;
 import dev.redio.ev3dev.alloc.NativeMethod;
 import dev.redio.ev3dev.exceptions.Ev3Exception;
 /**
- * 
- * @apiNote Tach counts are degrees
- *          Duty cycles are motor load in percent (-100 to 100) (backwards forwards)
+ * The class representing a LEGO Mindstorm Ev3 Motor or LargeMotor.<p>
+ * There are {NUMBER} rotate* methods that rotate the motor with different conditions:
+ * <h2>RotateLoad</h2>
+ * //TODO: Finish Motor Doc
+ * @apiNote Units are called Tach counts in other documentations.
+ *          Load is called Duty cycles in other documentations.
  */
 public final class Motor extends Native {
 
@@ -179,7 +180,8 @@ public final class Motor extends Native {
     public native float getSpeedPidKp() throws Ev3Exception;
 
     /**
-     * Returns the target speed set for the motor.
+     * Returns the target speed set for the motor.<p>
+     * The maximum possible speed is returned by the {@link Motor#getMaxSpeed} method.
      * @return the targeted speed
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
@@ -209,7 +211,7 @@ public final class Motor extends Native {
     public native StopAction[] getSupportedStopActions() throws Ev3Exception;
 
     /**
-     * Returns the time the motor will run in milliseconds when run using the {@link Motor#rotateUntil} method is called.
+     * Returns the time the motor will run in milliseconds when run using the {@link Motor#rotateUntil} method.
      * This value will be ignored by other rotate methods.
      * @return the targeted duration the motor will run
      * @throws Ev3Exception when {NOT DOCUMENTED}
@@ -275,7 +277,8 @@ public final class Motor extends Native {
     /**
      * Rotates the motor for as long as set using the {@link Motor#setTargetDuration} in milliseconds.<p>
      * The speed of the motor will be controlled by the {@link Motor#setTargetSpeed} method.<p>
-     * Changing any setting after the call to rotate will have no effect.
+     * Changing any setting after the call to rotate will have no effect.<p>
+     * The stop action is used to end the rotation once the target is reached.
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
     public native void rotateUntil() throws Ev3Exception;
@@ -284,7 +287,8 @@ public final class Motor extends Native {
      * Rotates the motor for as long as specified in the millis parameter in milliseconds.<p>
      * This overload ignores the set target duration.
      * The speed of the motor will be controlled by the {@link Motor#setTargetSpeed} method.<p>
-     * Changing any setting after the call to rotate will have no effect.
+     * Changing any setting after the call to rotate will have no effect.<p>
+     * The stop action is used to end the rotation once the target is reached.
      * @param mills the time the motor will be rotating for
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
@@ -293,8 +297,9 @@ public final class Motor extends Native {
     /**
      * Rotates the motor to the absolute position set by the {@link Motor#setTargetPosition} method.<p>
      * Whether the motor rotates clockwise or counter-clockwise is determent by whether the target position is larger or smaller then the current position.<p>
-     * The current position can be acquired using the {@link Motor#getAbsolutePosition} method.
-     * Changing any setting after the call to rotate will have no effect.
+     * The current position can be acquired using the {@link Motor#getAbsolutePosition} method.<p>
+     * Changing any setting after the call to rotate will have no effect.<p>
+     * The stop action is used to end the rotation once the target is reached.
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
     public native void rotateAbsolute() throws Ev3Exception;
@@ -303,8 +308,9 @@ public final class Motor extends Native {
      * Rotates the motor to the absolute position specified in the pos parameter.<p>
      * This overload ignores the set target position.
      * Whether the motor rotates clockwise or counter-clockwise is determent by whether the target position is larger or smaller then the current position.<p>
-     * The current position can be acquired using the {@link Motor#getAbsolutePosition} method.
-     * Changing any setting after the call to rotate will have no effect.
+     * The current position can be acquired using the {@link Motor#getAbsolutePosition} method.<p>
+     * Changing any setting after the call to rotate will have no effect.<p>
+     * The stop action is used to end the rotation once the target is reached.
      * @param pos the absolute target position of the motor in Units
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
@@ -313,7 +319,8 @@ public final class Motor extends Native {
     /**
      * Rotates the motor relative to the current position set by the {@link Motor#setTargetPosition} method.<p>
      * Whether the motor rotates clockwise or counter-clockwise is determent by whether the target position is positive or negative.<p>
-     * Changing any setting after the call to rotate will have no effect.
+     * Changing any setting after the call to rotate will have no effect.<p>
+     * The stop action is used to end the rotation once the target is reached.
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
     public native void rotateRelative() throws Ev3Exception;
@@ -322,7 +329,8 @@ public final class Motor extends Native {
      * Rotates the motor relative to the current position specified in the pos parameter.<p>
      * This overload ignores the set target position.
      * Whether the motor rotates clockwise or counter-clockwise is determent by whether the target position is positive or negative.<p>
-     * Changing any setting after the call to rotate will have no effect.
+     * Changing any setting after the call to rotate will have no effect.<p>
+     * The stop action is used to end the rotation once the target is reached.
      * @param pos the relative target position of the motor in Units
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
@@ -339,74 +347,270 @@ public final class Motor extends Native {
     public native void setTargetLoad(int load) throws Ev3Exception;
 
     /**
-     * 
+     * {UNCLEAR DOCUMENTATION}:<p>
+     * Sets the derivative pub constant for the position PID.
      * @param kd
-     * @throws Ev3Exception
+     * @throws Ev3Exception when {NOT DOCUMENTED}
      */
     public native void setHoldPidKd(float kd) throws Ev3Exception;
 
+    /**
+     * {UNCLEAR DOCUMENTATION}:<p>
+     * Sets the integral pub constant for the position PID.
+     * @param ki
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native void setHoldPidKi(float ki) throws Ev3Exception;
 
+    /**
+     * {UNCLEAR DOCUMENTATION}:<p>
+     * Sets the proportional pub constant for the position PID.
+     * @param kp
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native void setHoldPidKp(float kp) throws Ev3Exception;
 
+    /**
+     * Sets the polarity of the motor to the value passed as a parameter.<p>
+     * The polarity will decide whether the motor runs clockwise or counter_clockwise.
+     * @param polarity the new polarity for the motor
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native void setPolarity(Polarity polarity) throws Ev3Exception;
 
+    /**
+     * Sets the current position of the motor.<p>
+     * This will NOT rotate the motor it will simply reset the internal position value to the value passed as a parameter.
+     * @param position the new position of the motor. 
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native void setPosition(int position) throws Ev3Exception;
 
+    /**
+     * Sets the target position of the motor<p>
+     * This is both the absolute value for {@link Motor#rotateAbsolute} and the relative value for {@link Motor#rotateRelative}.
+     * @param position the new target position
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native void setTargetPosition(int position) throws Ev3Exception;
 
+    /**
+     * Sets the time the motor will take to slow down to standstill in milliseconds.<p>
+     * The actual slowdown can vary based on speed and outside side effects.
+     * @param slowdown the time the motor will need to stop in milliseconds
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native void setSlowdownTime(int slowdown) throws Ev3Exception;
 
-    public native void setSpeedupTime(int rampUp) throws Ev3Exception;
 
+    /**
+     * Sets the time the motor will take to speed up from standstill to set speed in milliseconds.<p>
+     * The actual speedup can vary based on speed and outside side effects.
+     * @param speedup the time the motor will need to reach full speed in milliseconds
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
+    public native void setSpeedupTime(int speedup) throws Ev3Exception;
+
+    /**
+     * {UNCLEAR DOCUMENTATION}:<p>
+     * Sets the derivative pub constant for the speed regulation PID.
+     * @param kd 
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native void setSpeedPidKd(float kd) throws Ev3Exception;
 
+    /**
+     * {UNCLEAR DOCUMENTATION}:<p>
+     * Sets the integral pub constant for the speed regulation PID.
+     * @param kd 
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native void setSpeedPidKi(float ki) throws Ev3Exception;
 
+    /**
+     * {UNCLEAR DOCUMENTATION}:<p>
+     * Sets the integral pub constant for the speed regulation PID.
+     * @param kd 
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native void setSpeedPidKp(float kp) throws Ev3Exception;
 
+    /**
+     * Sets the target speed set for the motor.<p>
+     * The maximum possible speed is returned by the {@link Motor#getMaxSpeed} method.
+     * @param speed the new targeted speed
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native void setTargetSpeed(int speed) throws Ev3Exception;
 
+    /**
+     * Sets the StopAction active for the motor.<p>
+     * This value determents the action taken when the {@link Motor#stop} method is called.
+     * @return the current StopAction
+     * @throws Ev3Exception when an unexpected value is received by the native library.
+     */
     public native void setStopAction(StopAction action) throws Ev3Exception;
 
+    /**
+     * Sets the time the motor will run in milliseconds when run using the {@link Motor#rotateUntil} method.
+     * This value will be ignored by other rotate methods.
+     * @return the targeted duration the motor will run
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native void setTargetDuration(int mills) throws Ev3Exception;
 
+    /**
+     * Stops the motor using the StopAction set using the {@link Motor#setStopAction} method.
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native void stop() throws Ev3Exception;
 
+    /**
+     * Returns true when the motor is a Ev3 LargeMotor.
+     * @return rather this is a large motor or not
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native boolean isLarge() throws Ev3Exception;
 
-    public native boolean sleepUntilNotMoving() throws Ev3Exception;
-
+    /**
+     * Blocks the current thread until the motor stopped moving.<p>
+     * This method blocks until {@link Motor#isRunning} returns false.
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     * @apiNote this method is equivalent to calling:
+     * <pre>
+     * motor.sleepWhile(State.RUNNING);
+     * </pre>
+     */
+    public native void sleepUntilNotMoving() throws Ev3Exception;
+    
+    /**
+     * Blocks the current thread until the motor stopped moving or a set timeout is reached.<p>
+     * This method blocks until {@link Motor#isRunning} returns false.
+     * @param timeout the timeout in milliseconds
+     * @return rather the timeout was reached or not //TODO:check if this needs to be inverted
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     * @apiNote this method is equivalent to calling:
+     * <pre>
+     * motor.sleepWhile(State.RUNNING, timeout);
+     * </pre>
+     */
     public native boolean sleepUntilNotMoving(long timeout) throws Ev3Exception;
 
-    public native boolean sleepUntil(State state) throws Ev3Exception;
+    /**
+     * Blocks the current thread until the passed state is reached.<p>
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
+    public native void sleepUntil(State state) throws Ev3Exception;
 
+    /**
+     * Blocks the current thread until the passed state is reached or a set timeout is reached.<p>
+     * @param timeout the timeout in milliseconds
+     * @return rather the timeout was reached or not //TODO:check if this needs to be inverted
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native boolean sleepUntil(State state, long timeout) throws Ev3Exception;
 
-    public native boolean sleepWhile(State state) throws Ev3Exception;
+    /**
+     * Blocks the current thread while the passed condition is met.<p>
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
+    public native void sleepWhile(State state) throws Ev3Exception;
 
+        /**
+     * Blocks the current thread while the passed condition is met or a set timeout is reached.<p>
+     * @param timeout the timeout in milliseconds
+     * @return rather the timeout was reached or not //TODO:check if this needs to be inverted
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     */
     public native boolean sleepWhile(State state, long timeout) throws Ev3Exception;
 
-    public native boolean sleep(BooleanSupplier condition) throws Ev3Exception;
+    /**
+     * Blocks the current thread until the condition returns true.<p>
+     * The condition is checked every time the State of the motor changes.
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     * @throws X when the condition callback function throws X
+     */
+    public native <X extends Exception> void sleep(Condition<X> condition) throws Ev3Exception, X;
 
-    public native boolean sleep(BooleanSupplier condition, long timeout) throws Ev3Exception;
+    /**
+     * Blocks the current thread until the condition returns true or a set timeout is reached.<p>
+     * The condition is checked every time the State of the motor changes.
+     * @param timeout the timeout in milliseconds
+     * @return rather the timeout was reached or not //TODO:check if this needs to be inverted
+     * @throws Ev3Exception when {NOT DOCUMENTED}
+     * @throws X when the condition callback function throws X
+     */
+    public native <X extends Exception> boolean sleep(Condition<X> condition, long timeout) throws Ev3Exception, X;
 
+    /**
+     * Defines the action the motor will use to slow down to standstill.
+     * @see StopAction.BRAKE
+     * @see StopAction.COAST
+     * @see StopAction.HOLD
+     */
     public enum StopAction {
+        /**
+         * Removes power from the motor and creates a passive electrical load.
+         * This is usually done by shorting the motor terminals together.
+         * This load will absorb the energy from the rotation of the motors and cause the motor to stop more quickly than coasting.
+         */
         BRAKE,
+        /**
+         * Removes power from the motor. The motor will freely coast to a stop.
+         */
         COAST,
+        /**
+         * Causes the motor to actively try to hold the current position.
+         * If an external force tries to turn the motor, the motor will “push back” to maintain its position.
+         */
         HOLD
     }
 
+    /**
+     * Defines the polarity of the motor. 
+     * @see Polarity.NORMAL
+     * @see Polarity.INVERSED
+     */
     public enum Polarity {
+        /**
+         * A positive load will cause the motor to rotate clockwise.
+         */
         NORMAL,
+
+        /**
+         * A positive load will cause the motor to rotate counter-clockwise.
+         */
         INVERSED
     }
 
+    /**
+     * Defines the possible states the motor can be in.
+     * @see State.HOLDING
+     * @see State.OVERLOADED
+     * @see State.RAMPING
+     * @see State.RUNNING
+     * @see State.STALLED
+     */
     public enum State {
+        /**
+         * The motor is not turning, but rather attempting to hold a fixed position.
+         */
         HOLDING,
+        /**
+         * The motor is turning as fast as possible, but cannot reach the value set using {@link Motor#setTargetSpeed} method.
+         */
         OVERLOADED,
+        /**
+         * The motor is ramping up or down and has not yet reached a stable speed.
+         */
         RAMPING,
+        /**
+         * Power is being sent to the motor.
+         */
         RUNNING,
+        /**
+         * The motor is trying to run but is not turning at all.
+         */
         STALLED
     }
 }

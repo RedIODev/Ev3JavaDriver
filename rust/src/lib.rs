@@ -29,7 +29,7 @@ pub mod dev_redio_ev3dev {
             alloc::RustObjectCarrier,
             enum_conversions::{IntEnum, JavaEnum},
             errors::{Ev3JApiError, EnumConversionError},
-            jni_shortcuts::{try_supplier, vec_to_jarray, wrap_obj, try_consumer, function, bi_function, boolean_supplier_callback},
+            jni_shortcuts::{try_supplier, vec_to_jarray, wrap_obj, try_consumer, function, bi_function, condition_callback},
             result_extensions::{FlattenInto, MapAuto},
         };
 
@@ -342,15 +342,16 @@ pub mod dev_redio_ev3dev {
             Ok(motor.clone().into_large_motor().is_ok())
         }
 
-        fn sleepUntilNotMoving__(jre: JNIEnv, this: JObject) -> Result<bool, Ev3JApiError> {
-            function(jre, this, None, TachoMotor::wait_until_not_moving)
+        fn sleepUntilNotMoving__(jre: JNIEnv, this: JObject) -> Result<(), Ev3JApiError> {
+            function(jre, this, None, TachoMotor::wait_until_not_moving)?;
+            Ok(())
         }
 
         fn sleepUntilNotMoving__J(jre: JNIEnv, this: JObject, mills: i64) -> Result<bool, Ev3JApiError> {
             function(jre, this, Some(Duration::from_millis(mills as u64)), TachoMotor::wait_until_not_moving)
         }
 
-        fn sleepUntil__Ldev_redio_ev3dev_Motor_State_2(jre: JNIEnv, this: JObject, state: JObject) -> Result<bool, Ev3JApiError> {
+        fn sleepUntil__Ldev_redio_ev3dev_Motor_State_2(jre: JNIEnv, this: JObject, state: JObject) -> Result<(), Ev3JApiError> {
             let ordinal = state.ordinal(jre)?;
             let state = match ordinal.as_ref() {
                 0 => TachoMotor::STATE_HOLDING,
@@ -360,7 +361,8 @@ pub mod dev_redio_ev3dev {
                 4 => TachoMotor::STATE_STALLED,
                 _ => return Err(EnumConversionError.into())
             };
-            bi_function(jre, this, state, None, TachoMotor::wait_until)
+            bi_function(jre, this, state, None, TachoMotor::wait_until)?;
+            Ok(())
         }
 
         fn sleepUntil__Ldev_redio_ev3dev_Motor_State_2J(jre: JNIEnv, this: JObject, state: JObject, mills: i64) -> Result<bool, Ev3JApiError> {
@@ -376,7 +378,7 @@ pub mod dev_redio_ev3dev {
             bi_function(jre, this, state, Some(Duration::from_millis(mills as u64)), TachoMotor::wait_until)
         }
 
-        fn sleep_while__Ldev_redio_ev3dev_Motor_State_2(jre: JNIEnv, this: JObject, state: JObject) -> Result<bool, Ev3JApiError> {
+        fn sleep_while__Ldev_redio_ev3dev_Motor_State_2(jre: JNIEnv, this: JObject, state: JObject) -> Result<(), Ev3JApiError> {
             let ordinal = state.ordinal(jre)?;
             let state = match ordinal.as_ref() {
                 0 => TachoMotor::STATE_HOLDING,
@@ -386,7 +388,8 @@ pub mod dev_redio_ev3dev {
                 4 => TachoMotor::STATE_STALLED,
                 _ => return Err(EnumConversionError.into())
             };
-            bi_function(jre, this, state, None, TachoMotor::wait_while)
+            bi_function(jre, this, state, None, TachoMotor::wait_while)?;
+            Ok(())
         }
 
         fn sleepWhile__Ldev_redio_ev3dev_Motor_State_2J(jre: JNIEnv, this: JObject, state: JObject, mills: i64) -> Result<bool, Ev3JApiError> {
@@ -402,13 +405,14 @@ pub mod dev_redio_ev3dev {
             bi_function(jre, this, state, Some(Duration::from_millis(mills as u64)), TachoMotor::wait_while)
         }
 
-        fn sleep__Ljava_util_function_BooleanSupplier_2(jre: JNIEnv, this: JObject, f: JObject) -> Result<bool, Ev3JApiError> {
-            let f = boolean_supplier_callback(jre, f);
-            bi_function(jre, this, f, None, TachoMotor::wait)
+        fn sleep__Ldev_redio_ev3dev_Condition_2(jre: JNIEnv, this: JObject, f: JObject) -> Result<(), Ev3JApiError> {
+            let f = condition_callback(jre, f);
+            bi_function(jre, this, f, None, TachoMotor::wait)?;
+            Ok(())
         }
 
-        fn sleep__Ljava_util_function_BooleanSupplier_2J(jre: JNIEnv, this: JObject, f: JObject, mills: i64) -> Result<bool, Ev3JApiError> {
-            let f = boolean_supplier_callback(jre, f);
+        fn sleep__Ldev_redio_ev3dev_Condition_2J(jre: JNIEnv, this: JObject, f: JObject, mills: i64) -> Result<bool, Ev3JApiError> {
+            let f = condition_callback(jre, f);
             bi_function(jre, this, f, Some(Duration::from_millis(mills as u64)), TachoMotor::wait)
         }
 
