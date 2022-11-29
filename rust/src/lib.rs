@@ -2,7 +2,7 @@
 #![allow(unused)]
 use jni_proc_macro::jni_package;
 mod alloc;
-mod enum_conversions;
+mod enums;
 mod errors;
 mod jni_shortcuts;
 mod result_extensions;
@@ -18,7 +18,7 @@ pub mod dev_redio_ev3dev {
         //use jni_proc_macro::optional_overload;
         use std::{time::Duration, borrow::Cow};
 
-        use ev3dev_lang_rust::motors::{TachoMotor, LargeMotor, MediumMotor};
+        use ev3dev_lang_rust::motors::{TachoMotor, LargeMotor, MediumMotor, MotorPort};
         use jni::{
             objects::{JClass, JObject, JString},
             sys::{jobjectArray, jlong},
@@ -27,7 +27,7 @@ pub mod dev_redio_ev3dev {
 
         use crate::{
             alloc::RustObjectCarrier,
-            enum_conversions::{IntEnum, JavaEnum},
+            enums::{JavaEnum, Enum, motor::{Polarity, StopAction, State}},
             errors::{Ev3JApiError, EnumConversionError},
             jni_shortcuts::{try_supplier, vec_to_jarray, wrap_obj, try_consumer, function, bi_function, condition_callback},
             result_extensions::{FlattenInto, MapAuto},
@@ -49,7 +49,7 @@ pub mod dev_redio_ev3dev {
             let port = jre
                 .get_object_array_element(args, 0)
                 .and_then(|o| o.ordinal(jre))
-                .map(IntEnum::try_into)
+                .map(|i| MotorPort::from_ordinal(i as u32))
                 .flatten_into::<Ev3JApiError>()?;
             let motor = TachoMotor::get(port)?;
             this.store(jre, motor).map_auto()
@@ -105,11 +105,7 @@ pub mod dev_redio_ev3dev {
             const ENUM_TYPE:&str = "dev/redio/ev3dev/Motor$Polarity";
             let enum_constants = JObject::values(jre, ENUM_TYPE)?;
             let string = try_supplier(jre, this, TachoMotor::get_polarity)?;
-            let ordinal = match string.as_str() {
-                TachoMotor::POLARITY_NORMAL => 0,
-                TachoMotor::POLARITY_INVERSED => 1,
-                _ => return Err(EnumConversionError.into())
-            };
+            let ordinal = Polarity::from_value(&string)?.ordinal::<u32>()? as i32;
             jre.get_object_array_element(enum_constants, ordinal).map_err(Ev3JApiError::from)
         }
 
@@ -155,14 +151,7 @@ pub mod dev_redio_ev3dev {
             let enum_constants = JObject::values(jre, ENUM_TYPE)?;
             let state = try_supplier(jre, this, TachoMotor::get_state)?;
             let match_func = |_, string: String| {
-                let ordinal = match string.as_str() {
-                    TachoMotor::STATE_HOLDING => 0,
-                    TachoMotor::STATE_OVERLOADED => 1,
-                    TachoMotor::STATE_RAMPING => 2,
-                    TachoMotor::STATE_RUNNING => 3,
-                    TachoMotor::STATE_STALLED => 4,
-                    _ => return Err(EnumConversionError.into())
-                };
+                let ordinal = State::from_value(&string)?.ordinal::<u32>()? as i32;
                 jre.get_object_array_element(enum_constants, ordinal).map_err(Ev3JApiError::from)
             };
             vec_to_jarray(jre, state, ENUM_TYPE, match_func)
@@ -175,12 +164,7 @@ pub mod dev_redio_ev3dev {
             const ENUM_TYPE:&str = "dev/redio/ev3dev/Motor$StopAction";
             let enum_constants = JObject::values(jre, ENUM_TYPE)?;
             let string = try_supplier(jre, this, TachoMotor::get_stop_action)?;
-            let ordinal = match string.as_str() {
-                TachoMotor::STOP_ACTION_BRAKE => 0,
-                TachoMotor::STOP_ACTION_COAST => 1,
-                TachoMotor::STOP_ACTION_HOLD => 2,
-                _ => return Err(EnumConversionError.into())
-            };
+            let ordinal = State::from_value(&string)?.ordinal::<u32>()? as i32;
             jre.get_object_array_element(enum_constants, ordinal).map_err(Ev3JApiError::from)
         }
 
@@ -189,12 +173,7 @@ pub mod dev_redio_ev3dev {
             let actions = try_supplier(jre, this, TachoMotor::get_stop_actions)?;
             let enum_constants = JObject::values(jre, ENUM_TYPE)?;
             let match_func = |_, string: String| {
-                let ordinal = match string.as_str() {
-                    TachoMotor::STOP_ACTION_BRAKE => 0,
-                    TachoMotor::STOP_ACTION_COAST => 1,
-                    TachoMotor::STOP_ACTION_HOLD => 2,
-                    _ => return Err(EnumConversionError.into())
-                };
+                let ordinal = StopAction::from_value(&string)?.ordinal::<u32>()? as i32;
                 jre.get_object_array_element(enum_constants, ordinal).map_err(Ev3JApiError::from)
             };
             vec_to_jarray(jre, actions, ENUM_TYPE, match_func)
@@ -278,11 +257,7 @@ pub mod dev_redio_ev3dev {
 
         fn setPolarity(jre: JNIEnv, this: JObject, polarity: JObject) -> Result<(), Ev3JApiError> {
             let ordinal = polarity.ordinal(jre)?;
-            let polarity = match ordinal.as_ref() {
-                0 => TachoMotor::POLARITY_NORMAL,
-                1 => TachoMotor::POLARITY_INVERSED,
-                _ => return Err(EnumConversionError.into())
-            };
+            let polarity = Polarity::from_ordinal(ordinal as u32)?.value();
             try_consumer(jre, this, polarity, TachoMotor::set_polarity)
         }
 
@@ -320,12 +295,7 @@ pub mod dev_redio_ev3dev {
 
         fn setStopAction(jre: JNIEnv, this: JObject, stopAction: JObject) -> Result<(), Ev3JApiError> {
             let ordinal = stopAction.ordinal(jre)?;
-            let action = match ordinal.as_ref() {
-                0 => TachoMotor::STOP_ACTION_BRAKE,
-                1 => TachoMotor::STOP_ACTION_COAST,
-                2 => TachoMotor::STOP_ACTION_HOLD,
-                _ => return Err(EnumConversionError.into())
-            };
+            let action = StopAction::from_ordinal(ordinal as u32)?.value();
             try_consumer(jre, this, action, TachoMotor::set_stop_action)
         }
 
@@ -353,55 +323,27 @@ pub mod dev_redio_ev3dev {
 
         fn sleepUntil__Ldev_redio_ev3dev_Motor_State_2(jre: JNIEnv, this: JObject, state: JObject) -> Result<(), Ev3JApiError> {
             let ordinal = state.ordinal(jre)?;
-            let state = match ordinal.as_ref() {
-                0 => TachoMotor::STATE_HOLDING,
-                1 => TachoMotor::STATE_OVERLOADED,
-                2 => TachoMotor::STATE_RAMPING,
-                3 => TachoMotor::STATE_RUNNING,
-                4 => TachoMotor::STATE_STALLED,
-                _ => return Err(EnumConversionError.into())
-            };
+            let state = State::from_ordinal(ordinal as u32)?.value();
             bi_function(jre, this, state, None, TachoMotor::wait_until)?;
             Ok(())
         }
 
         fn sleepUntil__Ldev_redio_ev3dev_Motor_State_2J(jre: JNIEnv, this: JObject, state: JObject, mills: i64) -> Result<bool, Ev3JApiError> {
             let ordinal = state.ordinal(jre)?;
-            let state = match ordinal.as_ref() {
-                0 => TachoMotor::STATE_HOLDING,
-                1 => TachoMotor::STATE_OVERLOADED,
-                2 => TachoMotor::STATE_RAMPING,
-                3 => TachoMotor::STATE_RUNNING,
-                4 => TachoMotor::STATE_STALLED,
-                _ => return Err(EnumConversionError.into())
-            };
+            let state = State::from_ordinal(ordinal as u32)?.value();
             bi_function(jre, this, state, Some(Duration::from_millis(mills as u64)), TachoMotor::wait_until)
         }
 
         fn sleep_while__Ldev_redio_ev3dev_Motor_State_2(jre: JNIEnv, this: JObject, state: JObject) -> Result<(), Ev3JApiError> {
             let ordinal = state.ordinal(jre)?;
-            let state = match ordinal.as_ref() {
-                0 => TachoMotor::STATE_HOLDING,
-                1 => TachoMotor::STATE_OVERLOADED,
-                2 => TachoMotor::STATE_RAMPING,
-                3 => TachoMotor::STATE_RUNNING,
-                4 => TachoMotor::STATE_STALLED,
-                _ => return Err(EnumConversionError.into())
-            };
+            let state = State::from_ordinal(ordinal as u32)?.value();
             bi_function(jre, this, state, None, TachoMotor::wait_while)?;
             Ok(())
         }
 
         fn sleepWhile__Ldev_redio_ev3dev_Motor_State_2J(jre: JNIEnv, this: JObject, state: JObject, mills: i64) -> Result<bool, Ev3JApiError> {
             let ordinal = state.ordinal(jre)?;
-            let state = match ordinal.as_ref() {
-                0 => TachoMotor::STATE_HOLDING,
-                1 => TachoMotor::STATE_OVERLOADED,
-                2 => TachoMotor::STATE_RAMPING,
-                3 => TachoMotor::STATE_RUNNING,
-                4 => TachoMotor::STATE_STALLED,
-                _ => return Err(EnumConversionError.into())
-            };
+            let state = State::from_ordinal(ordinal as u32)?.value();
             bi_function(jre, this, state, Some(Duration::from_millis(mills as u64)), TachoMotor::wait_while)
         }
 
@@ -430,7 +372,7 @@ pub mod dev_redio_ev3dev {
 
         use std::{time::Duration, borrow::Cow, cell::Ref};
 
-        use ev3dev_lang_rust::{motors::TachoMotor, sensors::ColorSensor, wait};
+        use ev3dev_lang_rust::{motors::TachoMotor, sensors::{ColorSensor, SensorPort}, wait};
         use jni::{
             objects::{JClass, JObject, JString},
             sys::{jobjectArray, jlong},
@@ -439,9 +381,9 @@ pub mod dev_redio_ev3dev {
 
         use crate::{
             alloc::RustObjectCarrier,
-            enum_conversions::{IntEnum, JavaEnum, ColorMode},
+            enums::{JavaEnum, Enum, sensors::color::ColorMode},
             errors::{Ev3JApiError, EnumConversionError},
-            jni_shortcuts::{try_supplier, vec_to_jarray, wrap_obj, try_consumer,new_color},
+            jni_shortcuts::{try_supplier, vec_to_jarray, wrap_obj, try_consumer,new_color, new_reflection},
             result_extensions::{FlattenInto, MapAuto},
         };
 
@@ -461,7 +403,7 @@ pub mod dev_redio_ev3dev {
             let port = jre
                 .get_object_array_element(args, 0)
                 .and_then(|o| o.ordinal(jre))
-                .map(IntEnum::try_into)
+                .map(|i| SensorPort::from_ordinal(i as u32))
                 .flatten_into::<Ev3JApiError>()?;
             let sensor = ColorSensor::get(port)?;
             this.store(jre, sensor).map_auto()
@@ -474,10 +416,6 @@ pub mod dev_redio_ev3dev {
 
         fn getBlue(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {    
             try_supplier(jre, this, ColorSensor::get_blue)
-        }
-
-        fn getIntensity(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {    
-            try_supplier(jre, this, ColorSensor::get_color)
         }
 
         fn getGreen(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {    
@@ -493,11 +431,29 @@ pub mod dev_redio_ev3dev {
             new_color(jre, r, g, b)
         }
 
+        fn getIntensity(jre: JNIEnv, this: JObject) -> Result<i32, Ev3JApiError> {    
+            try_supplier(jre, this, ColorSensor::get_color)
+        }
+
+        fn getReflection<'a>(jre: JNIEnv<'a>, this: JObject<'a>) -> Result<JObject<'a>, Ev3JApiError> {
+            let x = try_supplier(jre, this, ColorSensor::get_red)?;
+            let y = try_supplier(jre, this, ColorSensor::get_green)?;
+            new_reflection(jre, x, y)
+        }
+
+        fn getSimpleColor<'a>(jre: JNIEnv<'a>, this: JObject<'a>) -> Result<JObject<'a>, Ev3JApiError> {
+            let col = try_supplier(jre, this, ColorSensor::get_color)?;
+            let values = JObject::values(jre, "dev/redio/ev3dev/ColorSensor$SimpleColor")?;
+            jre.get_object_array_element(values, col).map_err(Ev3JApiError::from)
+        }
+
         fn setMode(jre: JNIEnv, this: JObject, mode: JObject) -> Result<(), Ev3JApiError> {
             use ColorMode::*;
-            let mode: ColorMode = mode.ordinal(jre)?.try_into()?;
+            let mode = ColorMode::from_ordinal(mode.ordinal(jre)? as u32)?;
             match mode {
+                SimpleColor => try_supplier(jre, this, ColorSensor::set_mode_col_color),
                 Color => try_supplier(jre, this, ColorSensor::set_mode_rgb_raw),
+                SimpleReflect => try_supplier(jre, this, ColorSensor::set_mode_col_reflect),
                 Reflect => try_supplier(jre, this, ColorSensor::set_mode_ref_raw),
                 Ambient => try_supplier(jre, this, ColorSensor::set_mode_col_ambient)
             }
@@ -505,14 +461,20 @@ pub mod dev_redio_ev3dev {
 
         fn getMode<'a>(jre: JNIEnv<'a>, this: JObject<'a>) -> Result<JObject<'a>, Ev3JApiError> {
             let values = JObject::values(jre, "dev/redio/ev3dev/ColorSensor$Mode")?;
-            if try_supplier(jre, this, ColorSensor::is_mode_rgb_raw)? {
+            if try_supplier(jre, this, ColorSensor::is_mode_col_color)? {
                 return jre.get_object_array_element(values, 0).map_err(Ev3JApiError::from);
             }
-            if try_supplier(jre, this, ColorSensor::is_mode_ref_raw)? {
+            if try_supplier(jre, this, ColorSensor::is_mode_rgb_raw)? {
                 return jre.get_object_array_element(values, 1).map_err(Ev3JApiError::from);
             }
-            if try_supplier(jre, this, ColorSensor::is_mode_col_ambient)? {
+            if try_supplier(jre, this, ColorSensor::is_mode_col_reflect)? {
                 return jre.get_object_array_element(values, 2).map_err(Ev3JApiError::from);
+            }
+            if try_supplier(jre, this, ColorSensor::is_mode_ref_raw)? {
+                return jre.get_object_array_element(values, 3).map_err(Ev3JApiError::from);
+            }
+            if try_supplier(jre, this, ColorSensor::is_mode_col_ambient)? {
+                return jre.get_object_array_element(values, 4).map_err(Ev3JApiError::from);
             }
             Err(EnumConversionError.into())
         }

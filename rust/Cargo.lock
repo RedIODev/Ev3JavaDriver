@@ -176,6 +176,7 @@ dependencies = [
  "ev3dev-lang-rust",
  "jni",
  "jni_proc_macro",
+ "num-traits",
 ]
 
 [[package]]

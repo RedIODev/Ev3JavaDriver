@@ -1,7 +1,10 @@
 package dev.redio.ev3dev;
+
+import java.util.Objects;
+
 /**
  * A simple Color class representing Colors using the rgb spectrum. 
- * The different RGB values range from 0 (no color) to X (intense Color) for each R, G, B value respectively.
+ * The different RGB values range from 0 (no color) to 1020 (intense Color) for each R, G, B value respectively.
  * @implNote the RGB values can vary depending on lighting conditions.
  * @author RedIODev
  */
@@ -24,7 +27,7 @@ public final class Color {
 
     /**
      * Returns the red value of this Color.
-     * @return 0 for no red to X for bright red
+     * @return 0 for no red to 1020 for bright red
      */
     public int red() {
         return red;
@@ -32,7 +35,7 @@ public final class Color {
 
     /**
      * Returns the green value of this Color.
-     * @return 0 for no green to X for bright green
+     * @return 0 for no green to 1020 for bright green
      */
     public int green() {
         return green;
@@ -40,7 +43,7 @@ public final class Color {
 
     /**
      * Returns the blue value of this Color.
-     * @return 0 for no blue to X for bright blue
+     * @return 0 for no blue to 1020 for bright blue
      */
     public int blue() {
         return blue;
@@ -67,25 +70,22 @@ public final class Color {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + red;
-        result = prime * result + green;
-        result = prime * result + blue;
-        return result;
+        return Objects.hash(red, green, blue);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (!(obj instanceof Color))
+        if (obj == null)
             return false;
-        Color other =(Color)obj;
-        return this.red == other.red &&
-                this.green == other.green &&
-                this.blue == other.blue;
+        if (getClass() != obj.getClass())
+            return false;
+        Color other = (Color) obj;
+        return red == other.red && green == other.green && blue == other.blue;
     }
+
+
 
 
 

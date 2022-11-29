@@ -7,6 +7,7 @@ edition = "2021"
 jni = "0.19"
 ev3dev-lang-rust = { version = "0.12.1", features=["screen"]}
 jni_proc_macro= {path= "./jni_proc_macro"}
+num-traits = "0.2.15"
 
 [lib]
 crate-type= ["cdylib"]

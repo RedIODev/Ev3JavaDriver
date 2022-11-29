@@ -85,6 +85,13 @@ pub fn new_color(jre: JNIEnv, red: i32, green: i32, blue: i32) -> Result<JObject
     Ok(jobj)
 }
 
+pub fn new_reflection(jre: JNIEnv, x: i32, y: i32) -> Result<JObject, Ev3JApiError> {
+    let x = jni::objects::JValue::Int(x);
+    let y = jni::objects::JValue::Int(y);
+    let jobj = jre.new_object("dev/redio/ev3dev/Reflection", "(II)V", &[x,y])?;
+    Ok(jobj)
+}
+
 
 pub fn condition_callback<'a>(jre: JNIEnv<'a>, f: JObject<'a>) -> impl Fn() -> bool + 'a {
     move || {

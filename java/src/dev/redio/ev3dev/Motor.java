@@ -10,6 +10,7 @@ import dev.redio.ev3dev.exceptions.Ev3Exception;
  * //TODO: Finish Motor Doc
  * @apiNote Units are called Tach counts in other documentations.
  *          Load is called Duty cycles in other documentations.
+ * @author RedIODev
  */
 public final class Motor extends Native {
 
@@ -544,9 +545,7 @@ public final class Motor extends Native {
 
     /**
      * Defines the action the motor will use to slow down to standstill.
-     * @see StopAction.BRAKE
-     * @see StopAction.COAST
-     * @see StopAction.HOLD
+     * @author RedIODev
      */
     public enum StopAction {
         /**
@@ -568,8 +567,7 @@ public final class Motor extends Native {
 
     /**
      * Defines the polarity of the motor. 
-     * @see Polarity.NORMAL
-     * @see Polarity.INVERSED
+     * @author RedIODev
      */
     public enum Polarity {
         /**
@@ -585,11 +583,7 @@ public final class Motor extends Native {
 
     /**
      * Defines the possible states the motor can be in.
-     * @see State.HOLDING
-     * @see State.OVERLOADED
-     * @see State.RAMPING
-     * @see State.RUNNING
-     * @see State.STALLED
+     * @author RedIODev
      */
     public enum State {
         /**
