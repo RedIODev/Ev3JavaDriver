@@ -2,8 +2,9 @@ package dev.redio.ev3dev;
 
 import dev.redio.ev3dev.alloc.Native;
 import dev.redio.ev3dev.alloc.NativeMethod;
+import dev.redio.ev3dev.exceptions.EnumConversionException;
 import dev.redio.ev3dev.exceptions.Ev3Exception;
-
+//TODO: Store current mode if avalible and prevent mismatch
 /**
  * The class representing a LEGO Mindstorm EV3 ColorSensor<p>
  * The ColorSensor supports 3 modes: Color, Reflection and Ambient<p>
@@ -25,8 +26,8 @@ import dev.redio.ev3dev.exceptions.Ev3Exception;
  * @see SensorPort
  * @author RedIODev
  */
-public final class ColorSensor extends Native {
-
+public final class ColorSensor extends Native { //https://docs.ev3dev.org/projects/lego-linux-drivers/en/ev3dev-stretch/sensor_data.html#lego-ev3-color
+    private Mode mode;
     /**
      * Finds the first ColorSensor connected to the Ev3 brick.
      * @return the first ColorSensor found
@@ -59,13 +60,24 @@ public final class ColorSensor extends Native {
     @Override
     protected native void delete0() throws Ev3Exception;
     
+    private native int value0() throws Ev3Exception;
+
+    private native int value1() throws Ev3Exception;
+
+    private native int value2() throws Ev3Exception;
+
+    private native void setMode0(Mode mode) throws Ev3Exception;
+
+    private native Mode getMode0() throws Ev3Exception;
     /**
      * Returns the red value measured by the sensor in Color mode.
      * @return the red value measured
      * @throws Ev3Exception when the sensor is not in Color mode.
      * @see Color
      */
-    public native int getRed() throws Ev3Exception;
+    public int getRed() throws Ev3Exception {
+        return value0();
+    }
 
     /**
      * Returns the green value measured by the sensor in Color mode.
@@ -73,7 +85,9 @@ public final class ColorSensor extends Native {
      * @throws Ev3Exception when the sensor is not in Color mode.
      * @see Color
      */
-    public native int getGreen() throws Ev3Exception;
+    public int getGreen() throws Ev3Exception {
+        return value1();
+    }
 
     /**
      * Returns the blue value measured by the sensor in Color mode.
@@ -81,7 +95,9 @@ public final class ColorSensor extends Native {
      * @throws Ev3Exception when the sensor is not in Color mode.
      * @see Color
      */
-    public native int getBlue() throws Ev3Exception;
+    public int getBlue() throws Ev3Exception {
+        return value2();
+    }
 
     /**
      * Returns the RGB value measured by the sensor in Color mode as a Color object.
@@ -89,20 +105,38 @@ public final class ColorSensor extends Native {
      * @throws Ev3Exception when the sensor is not in Color mode.
      * @see Color
      */
-    public native Color getRGB() throws Ev3Exception;
+    public Color getRGB() throws Ev3Exception {
+        return new Color(getRed(), getGreen(), getBlue());
+    }
     
+    public int getBrightness() throws Ev3Exception {
+        return value0();
+    }
     /**
-     * Returns the light intensity measured by the sensor.
+     * Returns the light intensity measured by the sensor. TODO:WRONG REFLECTION
      * <h3>Reflection</h3>
      * In reflection mode the values vary between 0 (100% reflection) to 1000 (100% absorption)
      * <h3>Ambient</h3>
-     * In ambient mode the values vary between X {NO_DATA} to Y {NO_DATA}
+     * In ambient mode the values vary between 0 to 100 (percent)
      * @return intensity of light in reflection and ambient mode
      * @throws Ev3Exception when the sensor is not in reflection or ambient mode
      * @implNote the intensity values can vary based on lighting conditions.
      * @see Color
      */
+    @Deprecated
     public native int getIntensity() throws Ev3Exception;
+
+    public SimpleColor getColor() throws Ev3Exception {
+        var index = getIntensity();
+        var colors = SimpleColor.values();
+        if (index < 0 || index >= colors.length)
+            throw new EnumConversionException(index);
+        return colors[index];
+    }
+
+    public RawReflection getRawReflection() throws Ev3Exception {
+        return new RawReflection(value0(), value1());
+    }
 
     /**
      * Sets the mode of the sensor.
@@ -110,22 +144,39 @@ public final class ColorSensor extends Native {
      * @throws Ev3Exception when something went wrong changing the mode
      * @see ColorSensor.Mode
      */
-    public native void setMode(Mode mode) throws Ev3Exception;
+    public Mode getMode() {
+
+    }
 
     /**
      * Gets the current mode of the sensor.
      * @return the mode of the sensor
      * @throws Ev3Exception when something went wrong reading the current mode
      */
-    public native Mode getMode() throws Ev3Exception;
+    public void setMode(Mode mode) {
+        
+    }
 
     /**
      * Represents the mode of the ColorSensor
      * @see ColorSensor
      */
     public enum Mode {
+        SIMPLE_COLOR,
         COLOR,
         REFLECTION,
-        AMBIENT;
+        RAW_REFLECTION,
+        AMBIENT
+    }
+
+    public enum SimpleColor {
+        NONE,
+        BLACK,
+        BLUE,
+        GREEN,
+        YELLOW,
+        RED,
+        WHITE,
+        BROWN
     }
 }

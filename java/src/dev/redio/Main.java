@@ -9,7 +9,7 @@ import dev.redio.ev3dev.Motor.Polarity;
 import dev.redio.ev3dev.Motor.StopAction;
 import dev.redio.ev3dev.exceptions.Ev3Exception;
 
-public class Main {
+public class Main { //Encode transfered values in primitives if possible. Reduce jni.
     public static void main(String[] args) throws Ev3Exception {
         try (var right = new Motor(MotorPort.OUT_A);
                 var left = new Motor(MotorPort.OUT_D);

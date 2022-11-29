@@ -7,7 +7,7 @@ use jni::{
     JNIEnv,
 };
 
-use crate::{alloc::RustObjectCarrier, errors::Ev3JApiError};
+use crate::{alloc::RustObjectCarrier, errors::{Ev3JApiError, JNIError}};
 
 pub fn try_supplier<R, T, E, F>(jre: JNIEnv, this: JObject, f: F) -> Result<R, Ev3JApiError>
 where
@@ -77,13 +77,16 @@ where T: Send + 'static
     Ok(jobj)
 } 
 
-pub fn new_color(jre: JNIEnv, red: i32, green: i32, blue: i32) -> Result<JObject, Ev3JApiError> {
-    let red = jni::objects::JValue::Int(red);
-    let green = jni::objects::JValue::Int(green);
-    let blue = jni::objects::JValue::Int(blue);
-    let jobj = jre.new_object("dev/redio/ev3dev/Color", "(III)V", &[red, green, blue])?;
-    Ok(jobj)
+pub fn get_int(jre: JNIEnv, integer: JObject) -> Result<i32,JNIError> {
+    jre.call_method(integer, "intValue", "()I", &[])?.i()
 }
+// pub fn new_color(jre: JNIEnv, red: i32, green: i32, blue: i32) -> Result<JObject, Ev3JApiError> {
+//     let red = jni::objects::JValue::Int(red);
+//     let green = jni::objects::JValue::Int(green);
+//     let blue = jni::objects::JValue::Int(blue);
+//     let jobj = jre.new_object("dev/redio/ev3dev/Color", "(III)V", &[red, green, blue])?;
+//     Ok(jobj)
+// }
 
 
 pub fn condition_callback<'a>(jre: JNIEnv<'a>, f: JObject<'a>) -> impl Fn() -> bool + 'a {

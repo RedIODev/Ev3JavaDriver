@@ -1,7 +1,7 @@
 package dev.redio.ev3dev;
 /**
  * A simple Color class representing Colors using the rgb spectrum. 
- * The different RGB values range from 0 (no color) to X (intense Color) for each R, G, B value respectively.
+ * The different RGB values range from 0 (no color) to 1020 (intense Color) for each R, G, B value respectively.
  * @implNote the RGB values can vary depending on lighting conditions.
  * @author RedIODev
  */
@@ -24,7 +24,7 @@ public final class Color {
 
     /**
      * Returns the red value of this Color.
-     * @return 0 for no red to X for bright red
+     * @return 0 for no red to 1020 for bright red
      */
     public int red() {
         return red;
@@ -32,7 +32,7 @@ public final class Color {
 
     /**
      * Returns the green value of this Color.
-     * @return 0 for no green to X for bright green
+     * @return 0 for no green to 1020 for bright green
      */
     public int green() {
         return green;
@@ -40,7 +40,7 @@ public final class Color {
 
     /**
      * Returns the blue value of this Color.
-     * @return 0 for no blue to X for bright blue
+     * @return 0 for no blue to 1020 for bright blue
      */
     public int blue() {
         return blue;

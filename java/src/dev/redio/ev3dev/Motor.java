@@ -446,7 +446,7 @@ public final class Motor extends Native {
     /**
      * Sets the StopAction active for the motor.<p>
      * This value determents the action taken when the {@link Motor#stop} method is called.
-     * @return the current StopAction
+     * @param action the new StopAction
      * @throws Ev3Exception when an unexpected value is received by the native library.
      */
     public native void setStopAction(StopAction action) throws Ev3Exception;
@@ -454,7 +454,7 @@ public final class Motor extends Native {
     /**
      * Sets the time the motor will run in milliseconds when run using the {@link Motor#rotateUntil} method.
      * This value will be ignored by other rotate methods.
-     * @return the targeted duration the motor will run
+     * @param mills the new target duration in milliseconds
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
     public native void setTargetDuration(int mills) throws Ev3Exception;
