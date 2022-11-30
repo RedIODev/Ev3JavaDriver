@@ -428,6 +428,7 @@ pub mod dev_redio_ev3dev {
 
         fn getRGB<'a>(jre: JNIEnv<'a>, this: JObject<'a>) -> Result<JObject<'a>, Ev3JApiError> {    
             let (r,g,b) = try_supplier(jre, this, ColorSensor::get_rgb)?;
+            let (r, g, b) = (r/4, g/4, b/4);
             new_color(jre, r, g, b)
         }
 

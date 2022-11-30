@@ -77,7 +77,7 @@ public final class Motor extends Native {
     public native int getTargetLoad() throws Ev3Exception;
 
     /**
-     * {UNCLEAR DOCUMENTATION}:<p>
+     * <h2>Experimental</h2>
      * The derivative constant for the position PID.
      * @return the derivative constant for the position PID
      * @throws Ev3Exception when {NOT DOCUMENTED}
@@ -85,7 +85,7 @@ public final class Motor extends Native {
     public native float getHoldPidKd() throws Ev3Exception;
 
     /**
-     * {UNCLEAR DOCUMENTATION}:<p>
+     * <h2>Experimental</h2>
      * The integral constant for the position PID.
      * @return the integral constant for the position PID
      * @throws Ev3Exception when {NOT DOCUMENTED}
@@ -93,7 +93,7 @@ public final class Motor extends Native {
     public native float getHoldPidKi() throws Ev3Exception;
 
     /**
-     * {UNCLEAR DOCUMENTATION}:<p>
+     * <h2>Experimental</h2>
      * The proportional constant for the position PID.
      * @return the proportional constant for the position PID
      * @throws Ev3Exception when {NOT DOCUMENTED}
@@ -157,7 +157,7 @@ public final class Motor extends Native {
     public native int getSpeed() throws Ev3Exception;
 
     /**
-     * {UNCLEAR DOCUMENTATION}:<p>
+     * <h2>Experimental</h2>
      * Returns the derivative pub constant for the speed regulation PID.
      * @return the derivative pub constant for the speed regulation PID
      * @throws Ev3Exception when {NOT DOCUMENTED}
@@ -165,7 +165,7 @@ public final class Motor extends Native {
     public native float getSpeedPidKd() throws Ev3Exception;
 
     /**
-     * {UNCLEAR DOCUMENTATION}:<p>
+     * <h2>Experimental</h2>
      * Returns the integral pub constant for the speed regulation PID.
      * @return the integral pub constant for the speed regulation PID
      * @throws Ev3Exception when {NOT DOCUMENTED}
@@ -173,7 +173,7 @@ public final class Motor extends Native {
     public native float getSpeedPidKi() throws Ev3Exception;
 
     /**
-     * {UNCLEAR DOCUMENTATION}:<p>
+     * <h2>Experimental</h2>
      * Returns the proportional pub constant for the speed regulation PID.
      * @return the proportional pub constant for the speed regulation PID
      * @throws Ev3Exception when {NOT DOCUMENTED}
@@ -348,25 +348,25 @@ public final class Motor extends Native {
     public native void setTargetLoad(int load) throws Ev3Exception;
 
     /**
-     * {UNCLEAR DOCUMENTATION}:<p>
+     * <h2>Experimental</h2>
      * Sets the derivative pub constant for the position PID.
-     * @param kd
+     * @param kd the new derivative constant
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
     public native void setHoldPidKd(float kd) throws Ev3Exception;
 
     /**
-     * {UNCLEAR DOCUMENTATION}:<p>
+     * <h2>Experimental</h2>
      * Sets the integral pub constant for the position PID.
-     * @param ki
+     * @param ki the new integral constant
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
     public native void setHoldPidKi(float ki) throws Ev3Exception;
 
     /**
-     * {UNCLEAR DOCUMENTATION}:<p>
+     * <h2>Experimental</h2>
      * Sets the proportional pub constant for the position PID.
-     * @param kp
+     * @param kp the new proportional constant
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
     public native void setHoldPidKp(float kp) throws Ev3Exception;
@@ -413,25 +413,25 @@ public final class Motor extends Native {
     public native void setSpeedupTime(int speedup) throws Ev3Exception;
 
     /**
-     * {UNCLEAR DOCUMENTATION}:<p>
+     * <h2>Experimental</h2>
      * Sets the derivative pub constant for the speed regulation PID.
-     * @param kd 
+     * @param kd the new derivative constant
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
     public native void setSpeedPidKd(float kd) throws Ev3Exception;
 
     /**
-     * {UNCLEAR DOCUMENTATION}:<p>
+     * <h2>Experimental</h2>
      * Sets the integral pub constant for the speed regulation PID.
-     * @param kd 
+     * @param ki the new integral constant
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
     public native void setSpeedPidKi(float ki) throws Ev3Exception;
 
     /**
-     * {UNCLEAR DOCUMENTATION}:<p>
-     * Sets the integral pub constant for the speed regulation PID.
-     * @param kd 
+     * <h2>Experimental</h2>
+     * Sets the proportional pub constant for the speed regulation PID.
+     * @param kp the new proportional constant
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
     public native void setSpeedPidKp(float kp) throws Ev3Exception;
@@ -447,7 +447,7 @@ public final class Motor extends Native {
     /**
      * Sets the StopAction active for the motor.<p>
      * This value determents the action taken when the {@link Motor#stop} method is called.
-     * @return the current StopAction
+     * @param action the new StopAction
      * @throws Ev3Exception when an unexpected value is received by the native library.
      */
     public native void setStopAction(StopAction action) throws Ev3Exception;
@@ -455,7 +455,7 @@ public final class Motor extends Native {
     /**
      * Sets the time the motor will run in milliseconds when run using the {@link Motor#rotateUntil} method.
      * This value will be ignored by other rotate methods.
-     * @return the targeted duration the motor will run
+     * @param mills the new targeted duration the motor will run
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
     public native void setTargetDuration(int mills) throws Ev3Exception;
@@ -499,12 +499,14 @@ public final class Motor extends Native {
 
     /**
      * Blocks the current thread until the passed state is reached.<p>
+     * @param state the state required to unblock the thread
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
     public native void sleepUntil(State state) throws Ev3Exception;
 
     /**
      * Blocks the current thread until the passed state is reached or a set timeout is reached.<p>
+     * @param state the state required to unblock the thread
      * @param timeout the timeout in milliseconds
      * @return rather the timeout was reached or not //TODO:check if this needs to be inverted
      * @throws Ev3Exception when {NOT DOCUMENTED}
@@ -513,12 +515,14 @@ public final class Motor extends Native {
 
     /**
      * Blocks the current thread while the passed condition is met.<p>
+     * @param state the state while which the thread will stay blocked
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
     public native void sleepWhile(State state) throws Ev3Exception;
 
         /**
      * Blocks the current thread while the passed condition is met or a set timeout is reached.<p>
+     * @param state the state while which the thread will stay blocked
      * @param timeout the timeout in milliseconds
      * @return rather the timeout was reached or not //TODO:check if this needs to be inverted
      * @throws Ev3Exception when {NOT DOCUMENTED}
@@ -528,6 +532,8 @@ public final class Motor extends Native {
     /**
      * Blocks the current thread until the condition returns true.<p>
      * The condition is checked every time the State of the motor changes.
+     * @param <X> the exception thrown by the condition
+     * @param condition the condition that needs to be met to unblock the thread
      * @throws Ev3Exception when {NOT DOCUMENTED}
      * @throws X when the condition callback function throws X
      */
@@ -536,7 +542,9 @@ public final class Motor extends Native {
     /**
      * Blocks the current thread until the condition returns true or a set timeout is reached.<p>
      * The condition is checked every time the State of the motor changes.
+     * @param condition the condition that needs to be met to unblock the thread
      * @param timeout the timeout in milliseconds
+     * @param <X> the exception thrown by the condition
      * @return rather the timeout was reached or not //TODO:check if this needs to be inverted
      * @throws Ev3Exception when {NOT DOCUMENTED}
      * @throws X when the condition callback function throws X
@@ -560,7 +568,7 @@ public final class Motor extends Native {
         COAST,
         /**
          * Causes the motor to actively try to hold the current position.
-         * If an external force tries to turn the motor, the motor will “push back” to maintain its position.
+         * If an external force tries to turn the motor, the motor will "push back" to maintain its position.
          */
         HOLD
     }

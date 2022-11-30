@@ -6,6 +6,7 @@
             "default": true
         }
     ],
+    "java.project.sourcePaths": ["./java/src", "./java/resources"],
     "cSpell.words": [
         "Inversed",
         "jarray",
@@ -22,4 +23,5 @@
         "uninitializing"
     ],
     "rust-analyzer.cargo.target": "armv5te-unknown-linux-gnueabi",
+    
 }

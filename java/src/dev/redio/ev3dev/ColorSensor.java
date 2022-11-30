@@ -6,7 +6,7 @@ import dev.redio.ev3dev.exceptions.Ev3Exception;
 
 /**
  * The class representing a LEGO Mindstorm EV3 ColorSensor<p>
- * The ColorSensor supports 5 modes: Color, Reflection and Ambient<p>
+ * The ColorSensor supports 5 modes: Simple Color, Color, Simple Reflection, Reflection and Ambient
  * <h2>Simple Color</h2>
  * In simple color mode the sensor will measure how close the color is to a preset of colors.
  * The sensor will return the color from the preset closest to the actual color.
@@ -70,6 +70,7 @@ public final class ColorSensor extends Native {
     
     /**
      * Returns the red value measured by the sensor in Color mode.
+     * The value ranges from 0 to 1020.
      * @return the red value measured
      * @throws Ev3Exception when the sensor is not in Color mode.
      * @see Color
@@ -78,6 +79,7 @@ public final class ColorSensor extends Native {
 
     /**
      * Returns the green value measured by the sensor in Color mode.
+     * The value ranges from 0 to 1020.
      * @return the green value measured
      * @throws Ev3Exception when the sensor is not in Color mode.
      * @see Color
@@ -86,6 +88,7 @@ public final class ColorSensor extends Native {
 
     /**
      * Returns the blue value measured by the sensor in Color mode.
+     * The value ranges from 0 to 1020.
      * @return the blue value measured
      * @throws Ev3Exception when the sensor is not in Color mode.
      * @see Color

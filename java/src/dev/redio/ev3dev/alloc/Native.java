@@ -1,5 +1,9 @@
 package dev.redio.ev3dev.alloc;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
 import dev.redio.ev3dev.exceptions.Ev3Exception;
 
 /**
@@ -12,11 +16,26 @@ import dev.redio.ev3dev.exceptions.Ev3Exception;
  */
 public abstract class Native implements AutoCloseable {
     
-    static {
-        System.loadLibrary("ev3");
+    static { //load native library
+        var libName = "libev3.so";
+        var url = Native.class.getResource("/" + libName);
+        try {
+            var tmpDir = Files.createTempDirectory("libev3tmp").toFile();
+            tmpDir.deleteOnExit();
+            var libTempFile = new File(tmpDir, libName);
+            libTempFile.deleteOnExit();
+            try (var is = url.openStream()) {
+                Files.copy(is, libTempFile.toPath());
+            }
+            System.load(libTempFile.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        //System.loadLibrary("ev3");
     }
 
-    @NativeField
+    @java.lang.annotation.Native
     private long ptr;
     private boolean isClosed = false;
 
@@ -28,8 +47,9 @@ public abstract class Native implements AutoCloseable {
     protected Native() {}
 
     /**
-     * @apiNote calling any method relying on the native structure after close was called results in undefined behavior.
      * {@inheritDoc}
+     * Frees the native structure.
+     * @apiNote calling any method relying on the native structure after close was called results in undefined behavior.
      */
     @Override
     public void close() throws Ev3Exception {
