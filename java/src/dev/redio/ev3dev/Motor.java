@@ -193,7 +193,7 @@ public final class Motor extends Native {
      * @return the state of the motor
      * @throws Ev3Exception when an unexpected value is returned by the native library.
      */
-    public native State[] getState() throws Ev3Exception;
+    public native MotorState[] getState() throws Ev3Exception;
 
     /**
      * Returns the current StopAction active for the motor.<p>
@@ -487,8 +487,9 @@ public final class Motor extends Native {
     /**
      * Blocks the current thread until the motor stopped moving or a set timeout is reached.<p>
      * This method blocks until {@link Motor#isRunning} returns false.
+     * Returns true when the motor stopped before the timeout.
      * @param timeout the timeout in milliseconds
-     * @return rather the timeout was reached or not //TODO:check if this needs to be inverted
+     * @return rather the timeout was reached or not
      * @throws Ev3Exception when {NOT DOCUMENTED}
      * @apiNote this method is equivalent to calling:
      * <pre>
@@ -502,32 +503,34 @@ public final class Motor extends Native {
      * @param state the state required to unblock the thread
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
-    public native void sleepUntil(State state) throws Ev3Exception;
+    public native void sleepUntil(MotorState state) throws Ev3Exception;
 
     /**
      * Blocks the current thread until the passed state is reached or a set timeout is reached.<p>
+     * Returns true when the condition was reached before the timeout.
      * @param state the state required to unblock the thread
      * @param timeout the timeout in milliseconds
-     * @return rather the timeout was reached or not //TODO:check if this needs to be inverted
+     * @return rather the timeout was reached or not
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
-    public native boolean sleepUntil(State state, long timeout) throws Ev3Exception;
+    public native boolean sleepUntil(MotorState state, long timeout) throws Ev3Exception;
 
     /**
      * Blocks the current thread while the passed condition is met.<p>
      * @param state the state while which the thread will stay blocked
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
-    public native void sleepWhile(State state) throws Ev3Exception;
+    public native void sleepWhile(MotorState state) throws Ev3Exception;
 
         /**
      * Blocks the current thread while the passed condition is met or a set timeout is reached.<p>
+     * Returns true when the condition ended the sleep before the timeout was reached.
      * @param state the state while which the thread will stay blocked
      * @param timeout the timeout in milliseconds
-     * @return rather the timeout was reached or not //TODO:check if this needs to be inverted
+     * @return rather the timeout was reached or not
      * @throws Ev3Exception when {NOT DOCUMENTED}
      */
-    public native boolean sleepWhile(State state, long timeout) throws Ev3Exception;
+    public native boolean sleepWhile(MotorState state, long timeout) throws Ev3Exception;
 
     /**
      * Blocks the current thread until the condition returns true.<p>
@@ -541,11 +544,12 @@ public final class Motor extends Native {
 
     /**
      * Blocks the current thread until the condition returns true or a set timeout is reached.<p>
-     * The condition is checked every time the State of the motor changes.
+     * The condition is checked every time the State of the motor changes.<p>
+     * Returns true when the condition was reached before the timeout.
      * @param condition the condition that needs to be met to unblock the thread
      * @param timeout the timeout in milliseconds
      * @param <X> the exception thrown by the condition
-     * @return rather the timeout was reached or not //TODO:check if this needs to be inverted
+     * @return rather the timeout was reached or not
      * @throws Ev3Exception when {NOT DOCUMENTED}
      * @throws X when the condition callback function throws X
      */
@@ -589,30 +593,5 @@ public final class Motor extends Native {
         INVERSED
     }
 
-    /**
-     * Defines the possible states the motor can be in.
-     * @author RedIODev
-     */
-    public enum State {
-        /**
-         * The motor is not turning, but rather attempting to hold a fixed position.
-         */
-        HOLDING,
-        /**
-         * The motor is turning as fast as possible, but cannot reach the value set using {@link Motor#setTargetSpeed} method.
-         */
-        OVERLOADED,
-        /**
-         * The motor is ramping up or down and has not yet reached a stable speed.
-         */
-        RAMPING,
-        /**
-         * Power is being sent to the motor.
-         */
-        RUNNING,
-        /**
-         * The motor is trying to run but is not turning at all.
-         */
-        STALLED
-    }
+    
 }

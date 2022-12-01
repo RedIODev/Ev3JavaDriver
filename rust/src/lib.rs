@@ -147,7 +147,7 @@ pub mod dev_redio_ev3dev {
         }
 
         fn getState(jre: JNIEnv, this: JObject) -> Result<jobjectArray, Ev3JApiError> {
-            const ENUM_TYPE:&str = "dev/redio/ev3dev/Motor$State";
+            const ENUM_TYPE:&str = "dev/redio/ev3dev/MotorState";
             let enum_constants = JObject::values(jre, ENUM_TYPE)?;
             let state = try_supplier(jre, this, TachoMotor::get_state)?;
             let match_func = |_, string: String| {
@@ -321,27 +321,27 @@ pub mod dev_redio_ev3dev {
             function(jre, this, Some(Duration::from_millis(mills as u64)), TachoMotor::wait_until_not_moving)
         }
 
-        fn sleepUntil__Ldev_redio_ev3dev_Motor_State_2(jre: JNIEnv, this: JObject, state: JObject) -> Result<(), Ev3JApiError> {
+        fn sleepUntil__Ldev_redio_ev3dev_MotorState_2(jre: JNIEnv, this: JObject, state: JObject) -> Result<(), Ev3JApiError> {
             let ordinal = state.ordinal(jre)?;
             let state = State::from_ordinal(ordinal as u32)?.value();
             bi_function(jre, this, state, None, TachoMotor::wait_until)?;
             Ok(())
         }
 
-        fn sleepUntil__Ldev_redio_ev3dev_Motor_State_2J(jre: JNIEnv, this: JObject, state: JObject, mills: i64) -> Result<bool, Ev3JApiError> {
+        fn sleepUntil__Ldev_redio_ev3dev_MotorState_2J(jre: JNIEnv, this: JObject, state: JObject, mills: i64) -> Result<bool, Ev3JApiError> {
             let ordinal = state.ordinal(jre)?;
             let state = State::from_ordinal(ordinal as u32)?.value();
             bi_function(jre, this, state, Some(Duration::from_millis(mills as u64)), TachoMotor::wait_until)
         }
 
-        fn sleep_while__Ldev_redio_ev3dev_Motor_State_2(jre: JNIEnv, this: JObject, state: JObject) -> Result<(), Ev3JApiError> {
+        fn sleep_while__Ldev_redio_ev3dev_MotorState_2(jre: JNIEnv, this: JObject, state: JObject) -> Result<(), Ev3JApiError> {
             let ordinal = state.ordinal(jre)?;
             let state = State::from_ordinal(ordinal as u32)?.value();
             bi_function(jre, this, state, None, TachoMotor::wait_while)?;
             Ok(())
         }
 
-        fn sleepWhile__Ldev_redio_ev3dev_Motor_State_2J(jre: JNIEnv, this: JObject, state: JObject, mills: i64) -> Result<bool, Ev3JApiError> {
+        fn sleepWhile__Ldev_redio_ev3dev_MotorState_2J(jre: JNIEnv, this: JObject, state: JObject, mills: i64) -> Result<bool, Ev3JApiError> {
             let ordinal = state.ordinal(jre)?;
             let state = State::from_ordinal(ordinal as u32)?.value();
             bi_function(jre, this, state, Some(Duration::from_millis(mills as u64)), TachoMotor::wait_while)

@@ -1,6 +1,5 @@
 @echo off
 cd java
-rmdir /S /Q build
 rmdir /S /Q javadoc
 cd src
 dir /s /B *.java > sources.txt
