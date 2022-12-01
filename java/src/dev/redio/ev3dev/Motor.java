@@ -8,6 +8,7 @@ import dev.redio.ev3dev.exceptions.Ev3Exception;
  * There are {NUMBER} rotate* methods that rotate the motor with different conditions:
  * <h2>RotateLoad</h2>
  * //TODO: Finish Motor Doc
+ * //TODO: Add impicit mode change for ColorSensor when certain methods are called.
  * @apiNote Units are called Tach counts in other documentations.
  *          Load is called Duty cycles in other documentations.
  * @author RedIODev
