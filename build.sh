@@ -5,7 +5,7 @@ rm -rf ./java/build
 mkdir -p ./java/build
 cd java/src
 zip -r Ev3Lib-sources.jar dev
-cp Ev3Lib-sources.jar ../build/Ev3Lib-sources.jar
+mv Ev3Lib-sources.jar ../build/Ev3Lib-sources.jar
 cd ../..
 cd rust
 echo Building rust
